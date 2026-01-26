@@ -53,7 +53,7 @@ export default function HomePage() {
               href="/autok"
               className="inline-flex items-center justify-center h-12 px-8 border border-foreground/20 text-sm uppercase tracking-widest hover:bg-foreground/5 transition-colors duration-300 animate-fade-up delay-200"
             >
-              Továbbiak megtekintése
+              Összes megtekintése
             </Link>
           </div>
 
@@ -91,7 +91,7 @@ export default function HomePage() {
       </section>
 
       {/* Services Section */}
-      <section className="py-32 border-t border-foreground/10">
+      <section id="szolgaltatasok" className="py-32 border-t border-foreground/10">
         <div className="container mx-auto px-6 lg:px-12">
           <div className="max-w-4xl mb-16">
             <h2 className="text-display-xl mb-4 animate-fade-up">
@@ -136,6 +136,61 @@ export default function HomePage() {
                     Elérhető személyautók és teherautók rövid vagy hosszú távra
                   </p>
                 </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Contact Section */}
+      <section id="kapcsolat" className="py-32 border-t border-foreground/10">
+        <div className="container mx-auto px-6 lg:px-12">
+          <div className="max-w-2xl">
+            <p className="text-sm uppercase tracking-[0.3em] text-muted-foreground mb-4 animate-fade-up">
+              Kapcsolat
+            </p>
+            <h2 className="text-display-xl mb-6 animate-fade-up delay-100">
+              Lépjen velünk kapcsolatba
+            </h2>
+            <p className="text-lg text-muted-foreground mb-16 animate-fade-up delay-200">
+              Kérdése van? Szívesen segítünk. Keressen minket telefonon vagy e-mailben.
+            </p>
+
+            <div className="space-y-12">
+              <div className="animate-fade-up delay-300">
+                <p className="text-sm uppercase tracking-widest text-muted-foreground mb-3">
+                  Telefon
+                </p>
+                <a
+                  href="tel:+36706050350"
+                  className="text-display-md line-hover inline-block"
+                >
+                  +36 70 605 0350
+                </a>
+              </div>
+
+              <div className="animate-fade-up delay-400">
+                <p className="text-sm uppercase tracking-widest text-muted-foreground mb-3">
+                  Email
+                </p>
+                <a
+                  href="mailto:osvath0911@gmail.com"
+                  className="text-display-md line-hover inline-block"
+                >
+                  osvath0911@gmail.com
+                </a>
+              </div>
+
+              <div className="animate-fade-up delay-500">
+                <p className="text-sm uppercase tracking-widest text-muted-foreground mb-3">
+                  Cím
+                </p>
+                <p className="text-display-md">
+                  9500 Celldömölk
+                </p>
+                <p className="text-display-md">
+                  Magyarország
+                </p>
               </div>
             </div>
           </div>

@@ -25,13 +25,13 @@ export function Footer() {
                 Kínálat
               </Link>
               <Link
-                href="/rolunk"
+                href="/#szolgaltatasok"
                 className="text-lg line-hover inline-block w-fit"
               >
-                Rólunk
+                Szolgáltatások
               </Link>
               <Link
-                href="/kapcsolat"
+                href="/#kapcsolat"
                 className="text-lg line-hover inline-block w-fit"
               >
                 Kapcsolat
@@ -63,24 +63,10 @@ export function Footer() {
         </div>
 
         {/* Bottom bar */}
-        <div className="py-8 border-t border-foreground/10 flex flex-col md:flex-row justify-between items-center gap-4">
+        <div className="py-8 border-t border-foreground/10 flex justify-center">
           <p className="text-sm text-muted-foreground">
             {new Date().getFullYear()} OSICAR
           </p>
-          <div className="flex gap-8">
-            <Link
-              href="/adatvedelem"
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Adatvédelem
-            </Link>
-            <Link
-              href="/aszf"
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-            >
-              ÁSZF
-            </Link>
-          </div>
         </div>
       </div>
     </footer>

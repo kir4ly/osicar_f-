@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,23 +14,41 @@ import {
 
 const navigation = [
   { name: "Kínálat", href: "/autok" },
-  { name: "Rólunk", href: "/rolunk" },
-  { name: "Kapcsolat", href: "/kapcsolat" },
+  { name: "Szolgáltatások", href: "/#szolgaltatasok" },
+  { name: "Kapcsolat", href: "/#kapcsolat" },
 ];
 
 export function Header() {
   const [open, setOpen] = useState(false);
+  const pathname = usePathname();
+  const router = useRouter();
+  const isHomePage = pathname === "/";
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50">
       <div className="container mx-auto flex h-20 items-center px-6 lg:px-12">
         <div className="flex-1 hidden md:block">
-          <Link
-            href="/"
-            className="text-sm uppercase tracking-widest text-foreground line-hover transition-opacity duration-300 hover:opacity-70"
-          >
-            Főoldal
-          </Link>
+          {!isHomePage && (
+            <button
+              onClick={() => router.back()}
+              className="inline-flex items-center gap-2 text-sm uppercase tracking-widest text-foreground transition-opacity duration-300 hover:opacity-70"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M19 12H5M12 19l-7-7 7-7" />
+              </svg>
+              Vissza
+            </button>
+          )}
         </div>
 
         <nav className="hidden md:flex items-center justify-center gap-12">
@@ -53,8 +72,30 @@ export function Header() {
           </a>
         </div>
 
+        {!isHomePage && (
+          <button
+            onClick={() => router.back()}
+            className="md:hidden inline-flex items-center gap-2 text-sm uppercase tracking-widest text-foreground transition-opacity duration-300 hover:opacity-70"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M19 12H5M12 19l-7-7 7-7" />
+            </svg>
+            Vissza
+          </button>
+        )}
+
         <Sheet open={open} onOpenChange={setOpen}>
-          <SheetTrigger asChild className="md:hidden">
+          <SheetTrigger asChild className="md:hidden ml-auto">
             <button className="text-foreground p-2">
               <div className="flex flex-col gap-1.5">
                 <span className="block w-6 h-px bg-foreground"></span>
