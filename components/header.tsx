@@ -25,7 +25,7 @@ export function Header() {
   const isHomePage = pathname === "/";
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-background">
       <div className="container mx-auto flex h-20 items-center px-6 lg:px-12">
         <div className="flex-1 hidden md:block">
           {!isHomePage && (
@@ -52,23 +52,67 @@ export function Header() {
         </div>
 
         <nav className="hidden md:flex items-center justify-center gap-12">
-          {navigation.map((item) => (
-            <Link
-              key={item.name}
-              href={item.href}
-              className="text-sm uppercase tracking-widest text-foreground line-hover transition-opacity duration-300 hover:opacity-70"
-            >
-              {item.name}
-            </Link>
-          ))}
+          {navigation.map((item) => {
+            const isAnchorLink = item.href.startsWith("/#");
+
+            if (isAnchorLink && !isHomePage) {
+              return (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  className="text-sm uppercase tracking-widest text-foreground line-hover transition-opacity duration-300 hover:opacity-70"
+                >
+                  {item.name}
+                </Link>
+              );
+            }
+
+            if (isAnchorLink && isHomePage) {
+              const anchorId = item.href.replace("/#", "");
+              return (
+                <a
+                  key={item.name}
+                  href={`#${anchorId}`}
+                  className="text-sm uppercase tracking-widest text-foreground line-hover transition-opacity duration-300 hover:opacity-70"
+                >
+                  {item.name}
+                </a>
+              );
+            }
+
+            return (
+              <Link
+                key={item.name}
+                href={item.href}
+                className="text-sm uppercase tracking-widest text-foreground line-hover transition-opacity duration-300 hover:opacity-70"
+              >
+                {item.name}
+              </Link>
+            );
+          })}
         </nav>
 
         <div className="flex-1 hidden md:flex justify-end">
-          <a
-            href="tel:+36706050350"
-            className="inline-flex items-center justify-center h-10 px-6 bg-primary text-primary-foreground text-sm uppercase tracking-widest hover:bg-primary/90 transition-colors duration-300"
-          >
-            06 70 605 0350
+          <a href="tel:+36706050350" className="call-button">
+            <div className="points_wrapper">
+              <i className="point"></i>
+              <i className="point"></i>
+              <i className="point"></i>
+              <i className="point"></i>
+              <i className="point"></i>
+              <i className="point"></i>
+              <i className="point"></i>
+              <i className="point"></i>
+              <i className="point"></i>
+              <i className="point"></i>
+            </div>
+            <span className="inner">
+              +36 70 605 0350
+              <svg className="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5">
+                <path d="M5 12h14"></path>
+                <path d="m12 5 7 7-7 7"></path>
+              </svg>
+            </span>
           </a>
         </div>
 
@@ -126,7 +170,7 @@ export function Header() {
                   href="tel:+36706050350"
                   className="block text-lg text-muted-foreground"
                 >
-                  06 70 605 0350
+                  +36 70 605 0350
                 </a>
                 <Button
                   asChild

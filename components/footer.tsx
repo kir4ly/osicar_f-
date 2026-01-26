@@ -1,19 +1,29 @@
+import { memo } from "react";
 import Link from "next/link";
+import Image from "next/image";
 
-export function Footer() {
+export const Footer = memo(function Footer() {
   return (
     <footer className="border-t border-foreground/10">
       <div className="container mx-auto px-6 lg:px-12">
         {/* Main footer */}
-        <div className="py-20 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
-          <div>
-            <p className="text-muted-foreground max-w-md">
-              Megbízható használt autók, átlátható ügyintézés.
-              Több mint 13 éve a piacon.
+        <div className="py-20 grid grid-cols-1 md:grid-cols-3 gap-12 lg:gap-20">
+          {/* Logo és leírás */}
+          <div className="flex flex-col">
+            <Image
+              src="/logo.svg"
+              alt="OSICAR Logo"
+              width={160}
+              height={48}
+              className="h-12 w-auto mb-6"
+            />
+            <p className="text-muted-foreground text-sm leading-relaxed max-w-[240px]">
+              Megbízható használt autók, átlátható ügyintézés. Több mint 13 éve a piacon.
             </p>
           </div>
 
-          <div>
+          {/* Navigáció */}
+          <div className="md:justify-self-center">
             <p className="text-sm uppercase tracking-widest text-muted-foreground mb-6">
               Navigáció
             </p>
@@ -39,7 +49,8 @@ export function Footer() {
             </nav>
           </div>
 
-          <div>
+          {/* Elérhetőség */}
+          <div className="md:justify-self-end md:text-right">
             <p className="text-sm uppercase tracking-widest text-muted-foreground mb-6">
               Elérhetőség
             </p>
@@ -48,13 +59,13 @@ export function Footer() {
               <p>Magyarország</p>
               <a
                 href="tel:+36706050350"
-                className="block line-hover w-fit"
+                className="block line-hover md:ml-auto w-fit"
               >
                 +36 70 605 0350
               </a>
               <a
                 href="mailto:osvath0911@gmail.com"
-                className="block line-hover w-fit"
+                className="block line-hover md:ml-auto w-fit"
               >
                 osvath0911@gmail.com
               </a>
@@ -71,4 +82,6 @@ export function Footer() {
       </div>
     </footer>
   );
-}
+});
+
+Footer.displayName = "Footer";

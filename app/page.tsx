@@ -34,6 +34,27 @@ export default function HomePage() {
           <p className="text-lg md:text-xl text-primary font-bold animate-fade-up delay-300">
             Több mint 13 év tapasztalat.
           </p>
+          <a href="tel:+36706050350" className="call-button mt-8 animate-fade-up delay-400">
+            <div className="points_wrapper">
+              <i className="point"></i>
+              <i className="point"></i>
+              <i className="point"></i>
+              <i className="point"></i>
+              <i className="point"></i>
+              <i className="point"></i>
+              <i className="point"></i>
+              <i className="point"></i>
+              <i className="point"></i>
+              <i className="point"></i>
+            </div>
+            <span className="inner">
+              Hívj minket
+              <svg className="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5">
+                <path d="M5 12h14"></path>
+                <path d="m12 5 7 7-7 7"></path>
+              </svg>
+            </span>
+          </a>
         </div>
       </section>
 
@@ -163,7 +184,7 @@ export default function HomePage() {
                 </p>
                 <a
                   href="tel:+36706050350"
-                  className="text-display-md line-hover inline-block"
+                  className="text-display-md line-hover inline-block text-primary"
                 >
                   +36 70 605 0350
                 </a>
@@ -175,7 +196,7 @@ export default function HomePage() {
                 </p>
                 <a
                   href="mailto:osvath0911@gmail.com"
-                  className="text-display-md line-hover inline-block"
+                  className="text-display-md line-hover inline-block text-primary"
                 >
                   osvath0911@gmail.com
                 </a>
@@ -185,10 +206,10 @@ export default function HomePage() {
                 <p className="text-sm uppercase tracking-widest text-muted-foreground mb-3">
                   Cím
                 </p>
-                <p className="text-display-md">
+                <p className="text-display-md text-primary">
                   9500 Celldömölk
                 </p>
-                <p className="text-display-md">
+                <p className="text-display-md text-primary">
                   Magyarország
                 </p>
               </div>

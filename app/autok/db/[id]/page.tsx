@@ -1,10 +1,56 @@
-"use client";
-
-import { useEffect, useState, use } from "react";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { supabase, CarData } from "@/lib/supabase";
+import { createClient } from "@supabase/supabase-js";
+import { CarData } from "@/lib/supabase";
+import { Metadata } from "next";
+
+// Revalidate every hour
+export const revalidate = 3600;
+
+const supabaseUrl = "https://avtfailpzsnelebpvebz.supabase.co";
+const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF2dGZhaWxwenNuZWxlYnB2ZWJ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk0MzEyMzcsImV4cCI6MjA4NTAwNzIzN30.I4_YUG2OuJJLspKh9v5Fp0rfAiRtzuZfLbWQbOd5rg0";
+
+async function getCar(id: string): Promise<CarData | null> {
+  const supabase = createClient(supabaseUrl, supabaseAnonKey);
+  const { data, error } = await supabase
+    .from("cars")
+    .select("*")
+    .eq("id", id)
+    .single();
+
+  if (error || !data) {
+    return null;
+  }
+
+  return data;
+}
+
+// Generate dynamic metadata for SEO
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  const car = await getCar(id);
+
+  if (!car) {
+    return {
+      title: "Autó nem található - OSICAR",
+    };
+  }
+
+  return {
+    title: `${car.brand} ${car.model} ${car.year} - OSICAR`,
+    description: car.description,
+    openGraph: {
+      title: `${car.brand} ${car.model} ${car.year}`,
+      description: car.description,
+      images: car.images?.[0] ? [car.images[0]] : [],
+    },
+  };
+}
 
 function formatPrice(price: number): string {
   return new Intl.NumberFormat("hu-HU").format(price);
@@ -14,45 +60,15 @@ function formatMileage(mileage: number): string {
   return new Intl.NumberFormat("hu-HU").format(mileage);
 }
 
-export default function CarDetailPage({
+export default async function CarDetailPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const { id } = use(params);
-  const [car, setCar] = useState<CarData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [notFoundState, setNotFoundState] = useState(false);
+  const { id } = await params;
+  const car = await getCar(id);
 
-  useEffect(() => {
-    async function fetchCar() {
-      const { data, error } = await supabase
-        .from("cars")
-        .select("*")
-        .eq("id", id)
-        .single();
-
-      if (error || !data) {
-        setNotFoundState(true);
-      } else {
-        setCar(data);
-      }
-      setLoading(false);
-    }
-    fetchCar();
-  }, [id]);
-
-  if (loading) {
-    return (
-      <div className="grain-overlay min-h-screen pt-32 pb-20">
-        <div className="container mx-auto px-6 lg:px-12">
-          <p className="text-display-md text-muted-foreground">Betöltés...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (notFoundState || !car) {
+  if (!car) {
     notFound();
   }
 
@@ -85,6 +101,8 @@ export default function CarDetailPage({
                   src={car.images[0]}
                   alt={`${car.brand} ${car.model}`}
                   fill
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                  priority
                   className="object-cover"
                 />
               ) : (
@@ -104,6 +122,8 @@ export default function CarDetailPage({
                       src={img}
                       alt={`${car.brand} ${car.model} - ${index + 2}`}
                       fill
+                      sizes="(max-width: 1024px) 25vw, 12.5vw"
+                      loading="lazy"
                       className="object-cover"
                     />
                   </div>
@@ -182,10 +202,10 @@ export default function CarDetailPage({
                 Érdeklődök
               </Link>
               <a
-                href="tel:+3612345678"
+                href="tel:+36706050350"
                 className="inline-flex items-center justify-center h-14 px-10 border border-foreground/20 text-sm uppercase tracking-widest hover:bg-foreground/5 transition-colors duration-300"
               >
-                +36 1 234 5678
+                +36 70 605 0350
               </a>
             </div>
           </div>

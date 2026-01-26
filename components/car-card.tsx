@@ -1,3 +1,4 @@
+import { memo } from "react";
 import Link from "next/link";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -13,7 +14,7 @@ function formatMileage(mileage: number): string {
   return new Intl.NumberFormat("hu-HU").format(mileage) + " km";
 }
 
-export function CarCard({ car }: { car: Car }) {
+export const CarCard = memo(function CarCard({ car }: { car: Car }) {
   return (
     <Card className="overflow-hidden group">
       <div className="relative aspect-[16/10] bg-muted overflow-hidden">
@@ -59,4 +60,6 @@ export function CarCard({ car }: { car: Car }) {
       </CardFooter>
     </Card>
   );
-}
+});
+
+CarCard.displayName = "CarCard";
