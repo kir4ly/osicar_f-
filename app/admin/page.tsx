@@ -12,11 +12,17 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
+const ADMIN_PASSWORD = "osvath123";
+
 function formatPrice(price: number): string {
   return new Intl.NumberFormat("hu-HU").format(price);
 }
 
 export default function AdminPage() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [password, setPassword] = useState("");
+  const [passwordError, setPasswordError] = useState(false);
+
   const [cars, setCars] = useState<CarData[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -40,8 +46,28 @@ export default function AdminPage() {
   });
 
   useEffect(() => {
-    fetchCars();
+    const savedAuth = sessionStorage.getItem("adminAuth");
+    if (savedAuth === "true") {
+      setIsAuthenticated(true);
+    }
   }, []);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchCars();
+    }
+  }, [isAuthenticated]);
+
+  function handleLogin(e: React.FormEvent) {
+    e.preventDefault();
+    if (password === ADMIN_PASSWORD) {
+      setIsAuthenticated(true);
+      sessionStorage.setItem("adminAuth", "true");
+      setPasswordError(false);
+    } else {
+      setPasswordError(true);
+    }
+  }
 
   async function fetchCars() {
     setLoading(true);
@@ -155,6 +181,53 @@ export default function AdminPage() {
     setShowForm(false);
   }
 
+  if (!isAuthenticated) {
+    return (
+      <div className="grain-overlay min-h-screen pt-32 pb-20">
+        <div className="container mx-auto px-6 lg:px-12">
+          <div className="max-w-md mx-auto">
+            <div className="mb-16 text-center">
+              <p className="text-sm uppercase tracking-[0.3em] text-muted-foreground mb-4 animate-fade-up">
+                Adminisztráció
+              </p>
+              <h1 className="text-display-xl animate-fade-up delay-100">
+                Bejelentkezés
+              </h1>
+            </div>
+
+            <form onSubmit={handleLogin} className="space-y-6 animate-fade-up delay-200">
+              <div>
+                <label className="text-sm uppercase tracking-widest text-muted-foreground mb-3 block">
+                  Jelszó
+                </label>
+                <Input
+                  type="password"
+                  value={password}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    setPasswordError(false);
+                  }}
+                  placeholder="Adja meg a jelszót"
+                  required
+                  className={`h-14 bg-transparent border-foreground/10 text-lg ${passwordError ? 'border-red-500' : ''}`}
+                />
+                {passwordError && (
+                  <p className="text-red-500 text-sm mt-2">Hibás jelszó</p>
+                )}
+              </div>
+              <button
+                type="submit"
+                className="w-full inline-flex items-center justify-center h-14 px-10 bg-primary text-primary-foreground text-sm uppercase tracking-widest hover:bg-primary/90 transition-colors duration-300"
+              >
+                Belépés
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="grain-overlay min-h-screen pt-32 pb-20">
       <div className="container mx-auto px-6 lg:px-12">
@@ -176,6 +249,15 @@ export default function AdminPage() {
             className="inline-flex items-center justify-center h-14 px-10 bg-primary text-primary-foreground text-sm uppercase tracking-widest hover:bg-primary/90 transition-colors duration-300"
           >
             Új autó hozzáadása
+          </button>
+          <button
+            onClick={() => {
+              sessionStorage.removeItem("adminAuth");
+              setIsAuthenticated(false);
+            }}
+            className="inline-flex items-center justify-center h-14 px-10 border border-foreground/20 text-sm uppercase tracking-widest hover:bg-foreground/5 transition-colors duration-300"
+          >
+            Kijelentkezés
           </button>
         </div>
 

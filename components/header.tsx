@@ -26,9 +26,9 @@ export function Header() {
         <div className="flex-1 hidden md:block">
           <Link
             href="/"
-            className="hover:opacity-70 transition-opacity duration-300"
+            className="text-sm uppercase tracking-widest text-foreground line-hover transition-opacity duration-300 hover:opacity-70"
           >
-            <span className="sr-only">Főoldal</span>
+            Főoldal
           </Link>
         </div>
 
