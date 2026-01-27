@@ -14,6 +14,8 @@ export interface Car {
   features: string[];
   images: string[];
   featured: boolean;
+  sold?: boolean;
+  isFromSupabase?: boolean;
 }
 
 export const cars: Car[] = [
