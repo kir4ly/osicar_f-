@@ -21,5 +21,6 @@ export interface CarData {
   images: string[];
   featured: boolean;
   sold: boolean;
+  fulfilled: boolean;
   created_at: string;
 }

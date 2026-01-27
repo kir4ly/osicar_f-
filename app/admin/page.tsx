@@ -11,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Plus, X, Upload, Link as LinkIcon, Check } from "lucide-react";
+import { Plus, X, Upload, Link as LinkIcon, Check, PackageCheck } from "lucide-react";
 
 const ADMIN_PASSWORD = "osvath123";
 
@@ -164,6 +164,32 @@ export default function AdminPage() {
       setCars(prevCars =>
         prevCars.map(c =>
           c.id === car.id ? { ...c, sold: isCurrentlySold } : c
+        )
+      );
+    }
+  }
+
+  async function toggleFulfilled(car: CarData) {
+    const isCurrentlyFulfilled = car.fulfilled;
+
+    // Optimistic update
+    setCars(prevCars =>
+      prevCars.map(c =>
+        c.id === car.id ? { ...c, fulfilled: !isCurrentlyFulfilled } : c
+      )
+    );
+
+    const { error } = await supabase
+      .from("cars")
+      .update({ fulfilled: !isCurrentlyFulfilled })
+      .eq("id", car.id);
+
+    if (error) {
+      console.error("Error toggling fulfilled:", error);
+      alert("Hiba történt a teljesítés státusz módosítása során");
+      setCars(prevCars =>
+        prevCars.map(c =>
+          c.id === car.id ? { ...c, fulfilled: isCurrentlyFulfilled } : c
         )
       );
     }
@@ -748,7 +774,7 @@ export default function AdminPage() {
             </div>
 
             {/* Eladott autók szekció */}
-            {cars.filter(c => c.sold).length > 0 && (
+            {cars.filter(c => c.sold && !c.fulfilled).length > 0 && (
               <>
                 <div className="border-t border-foreground/10 pt-8 mt-8">
                   <div className="flex items-center gap-2 mb-4 md:mb-6">
@@ -757,12 +783,12 @@ export default function AdminPage() {
                       Eladott autók
                     </h3>
                     <span className="text-xs md:text-sm text-muted-foreground">
-                      ({cars.filter(c => c.sold).length} db)
+                      ({cars.filter(c => c.sold && !c.fulfilled).length} db)
                     </span>
                   </div>
                 </div>
                 <div className="grid gap-3 md:gap-4">
-                  {cars.filter(c => c.sold).map((car) => (
+                  {cars.filter(c => c.sold && !c.fulfilled).map((car) => (
                     <div
                       key={car.id}
                       className="border border-green-500/30 bg-green-500/5 p-4 md:p-6 flex flex-col gap-3 md:gap-4 opacity-70"
@@ -786,8 +812,71 @@ export default function AdminPage() {
                       </div>
                       <div className="flex flex-wrap gap-2 md:gap-3 ml-10 md:ml-14">
                         <button
+                          onClick={() => toggleFulfilled(car)}
+                          className="h-9 md:h-10 px-4 md:px-6 border border-blue-500/50 text-blue-500 text-xs md:text-sm uppercase tracking-widest hover:bg-blue-500/10 transition-colors duration-300"
+                        >
+                          Teljesítve
+                        </button>
+                        <button
                           onClick={() => toggleSold(car)}
                           className="h-9 md:h-10 px-4 md:px-6 border border-green-500/50 text-green-500 text-xs md:text-sm uppercase tracking-widest hover:bg-green-500/10 transition-colors duration-300"
+                        >
+                          Visszaállítás
+                        </button>
+                        <button
+                          onClick={() => handleDelete(car.id)}
+                          className="h-9 md:h-10 px-4 md:px-6 border border-red-500/50 text-red-500 text-xs md:text-sm uppercase tracking-widest hover:bg-red-500/10 transition-colors duration-300"
+                        >
+                          Törlés
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+
+            {/* Teljesített megrendelések szekció */}
+            {cars.filter(c => c.fulfilled).length > 0 && (
+              <>
+                <div className="border-t border-foreground/10 pt-8 mt-8">
+                  <div className="flex items-center gap-2 mb-4 md:mb-6">
+                    <PackageCheck className="w-5 h-5 text-blue-500" />
+                    <h3 className="text-lg md:text-display-md font-display uppercase text-blue-500">
+                      Teljesített megrendelések
+                    </h3>
+                    <span className="text-xs md:text-sm text-muted-foreground">
+                      ({cars.filter(c => c.fulfilled).length} db)
+                    </span>
+                  </div>
+                </div>
+                <div className="grid gap-3 md:gap-4">
+                  {cars.filter(c => c.fulfilled).map((car) => (
+                    <div
+                      key={car.id}
+                      className="border border-blue-500/30 bg-blue-500/5 p-4 md:p-6 flex flex-col gap-3 md:gap-4 opacity-60"
+                    >
+                      <div className="flex items-start gap-3 md:gap-4">
+                        <div className="mt-0.5 p-1.5 md:p-2">
+                          <PackageCheck className="w-5 h-5 md:w-6 md:h-6 text-blue-500" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h3 className="text-base md:text-display-md mb-0.5 md:mb-1 font-display uppercase truncate">
+                            {car.brand} {car.model}
+                          </h3>
+                          <p className="text-xs md:text-sm text-muted-foreground">
+                            {car.year} / {car.mileage.toLocaleString("hu-HU")} km /{" "}
+                            {car.fuel} / {car.transmission}
+                          </p>
+                          <p className="text-blue-500 text-base md:text-lg mt-1 md:mt-2 font-display line-through">
+                            {formatPrice(car.price)} Ft
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex flex-wrap gap-2 md:gap-3 ml-10 md:ml-14">
+                        <button
+                          onClick={() => toggleFulfilled(car)}
+                          className="h-9 md:h-10 px-4 md:px-6 border border-blue-500/50 text-blue-500 text-xs md:text-sm uppercase tracking-widest hover:bg-blue-500/10 transition-colors duration-300"
                         >
                           Visszaállítás
                         </button>
