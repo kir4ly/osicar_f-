@@ -15,6 +15,7 @@ export interface Car {
   images: string[];
   featured: boolean;
   sold?: boolean;
+  fulfilled?: boolean;
   isFromSupabase?: boolean;
 }
 

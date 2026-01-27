@@ -722,11 +722,11 @@ export default function AdminPage() {
           <div className="space-y-3 md:space-y-4 animate-fade-up delay-300">
             <div className="mb-4 md:mb-8">
               <p className="text-xs md:text-sm text-muted-foreground">
-                {cars.filter(c => !c.sold).length} autó az adatbázisban
+                {cars.filter(c => !c.sold && !c.fulfilled).length} elérhető autó
               </p>
             </div>
             <div className="grid gap-3 md:gap-4">
-              {cars.filter(c => !c.sold).map((car) => (
+              {cars.filter(c => !c.sold && !c.fulfilled).map((car) => (
                 <div
                   key={car.id}
                   className="border border-foreground/10 p-4 md:p-6 flex flex-col gap-3 md:gap-4"
@@ -754,13 +754,15 @@ export default function AdminPage() {
                     </button>
                     <button
                       onClick={() => toggleSold(car)}
-                      className={`h-9 md:h-10 px-4 md:px-6 border text-xs md:text-sm uppercase tracking-widest transition-colors duration-300 ${
-                        car.sold
-                          ? 'border-green-500/50 text-green-500 hover:bg-green-500/10'
-                          : 'border-foreground/20 hover:bg-foreground/5'
-                      }`}
+                      className="h-9 md:h-10 px-4 md:px-6 border border-green-500/50 text-green-500 text-xs md:text-sm uppercase tracking-widest hover:bg-green-500/10 transition-colors duration-300"
                     >
-                      {car.sold ? 'Visszaállítás' : 'Eladva'}
+                      Eladva
+                    </button>
+                    <button
+                      onClick={() => toggleFulfilled(car)}
+                      className="h-9 md:h-10 px-4 md:px-6 border border-blue-500/50 text-blue-500 text-xs md:text-sm uppercase tracking-widest hover:bg-blue-500/10 transition-colors duration-300"
+                    >
+                      Teljesítve
                     </button>
                     <button
                       onClick={() => handleDelete(car.id)}
@@ -774,7 +776,7 @@ export default function AdminPage() {
             </div>
 
             {/* Eladott autók szekció */}
-            {cars.filter(c => c.sold && !c.fulfilled).length > 0 && (
+            {cars.filter(c => c.sold).length > 0 && (
               <>
                 <div className="border-t border-foreground/10 pt-8 mt-8">
                   <div className="flex items-center gap-2 mb-4 md:mb-6">
@@ -783,12 +785,12 @@ export default function AdminPage() {
                       Eladott autók
                     </h3>
                     <span className="text-xs md:text-sm text-muted-foreground">
-                      ({cars.filter(c => c.sold && !c.fulfilled).length} db)
+                      ({cars.filter(c => c.sold).length} db)
                     </span>
                   </div>
                 </div>
                 <div className="grid gap-3 md:gap-4">
-                  {cars.filter(c => c.sold && !c.fulfilled).map((car) => (
+                  {cars.filter(c => c.sold).map((car) => (
                     <div
                       key={car.id}
                       className="border border-green-500/30 bg-green-500/5 p-4 md:p-6 flex flex-col gap-3 md:gap-4 opacity-70"
@@ -811,12 +813,6 @@ export default function AdminPage() {
                         </div>
                       </div>
                       <div className="flex flex-wrap gap-2 md:gap-3 ml-10 md:ml-14">
-                        <button
-                          onClick={() => toggleFulfilled(car)}
-                          className="h-9 md:h-10 px-4 md:px-6 border border-blue-500/50 text-blue-500 text-xs md:text-sm uppercase tracking-widest hover:bg-blue-500/10 transition-colors duration-300"
-                        >
-                          Teljesítve
-                        </button>
                         <button
                           onClick={() => toggleSold(car)}
                           className="h-9 md:h-10 px-4 md:px-6 border border-green-500/50 text-green-500 text-xs md:text-sm uppercase tracking-widest hover:bg-green-500/10 transition-colors duration-300"
