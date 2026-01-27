@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { cars } from "@/lib/data";
+import { CTAButton } from "@/components/cta-button";
 
 function formatPrice(price: number): string {
   return new Intl.NumberFormat("hu-HU").format(price);
@@ -41,12 +42,11 @@ export default async function CarDetailPage({
     <div className="grain-overlay min-h-screen pt-32 pb-20">
       <div className="container mx-auto px-6 lg:px-12">
         {/* Back link */}
-        <Link
-          href="/autok"
-          className="inline-block text-sm uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors mb-12 animate-fade-up"
-        >
-          Vissza a kínálathoz
-        </Link>
+        <div className="mb-12 animate-fade-up">
+          <CTAButton href="/#kinalat" direction="left">
+            Vissza a kínálathoz
+          </CTAButton>
+        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20">
           {/* Left column - Image */}

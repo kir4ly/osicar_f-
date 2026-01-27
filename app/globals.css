@@ -506,3 +506,36 @@ html {
     stroke-dashoffset: -10;
   }
 }
+
+/* Header CTA Button */
+.header-cta-button {
+  --main-color: #3476EA;
+  --main-bg-color: rgba(52, 118, 234, 0.36);
+  --pattern-color: rgba(52, 118, 234, 0.073);
+  color: var(--main-color);
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  letter-spacing: 0.05em;
+  background-size: cover, 15px 15px, 15px 15px;
+  background-position: center center, center center, center center;
+  border: 1px solid transparent;
+  border-image: radial-gradient(circle, var(--main-color) 0%, rgba(0, 0, 0, 0) 100%) 1;
+  border-width: 1px;
+  backdrop-filter: blur(24px);
+  box-shadow: 0 4px 30px rgba(52, 118, 234, 0.15);
+}
+
+.header-cta-button:hover {
+  box-shadow: 0 0 0 1px rgba(52, 118, 234, 0.35), 0 40px 80px rgba(52, 118, 234, 0.18);
+  background-size: cover, 10px 10px, 10px 10px;
+}
+
+.header-cta-button:active {
+  filter: hue-rotate(250deg);
+}
+
+.header-cta-inner {
+  background: radial-gradient(120% 80% at 50% -20%, rgba(255,255,255,0.28) 0%, rgba(255,255,255,0.06) 55%, rgba(255,255,255,0) 60%),
+              radial-gradient(90% 80% at 50% 120%, rgba(52, 118, 234, 0.18) 0%, rgba(52, 118, 234, 0) 60%);
+}

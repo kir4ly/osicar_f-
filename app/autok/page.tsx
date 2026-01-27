@@ -30,14 +30,14 @@ export default async function CarsPage() {
   const supabaseCars = await getSupabaseCars();
 
   return (
-    <div className="grain-overlay min-h-screen pt-32 pb-20">
-      <div className="container mx-auto px-6 lg:px-12">
+    <div className="grain-overlay min-h-screen pt-24 md:pt-32 pb-12 md:pb-20">
+      <div className="container mx-auto px-4 md:px-6 lg:px-12">
         {/* Header */}
-        <div className="mb-16">
-          <p className="text-sm uppercase tracking-[0.3em] text-muted-foreground mb-4 animate-fade-up">
+        <div className="mb-8 md:mb-16">
+          <p className="text-xs md:text-sm uppercase tracking-[0.3em] text-muted-foreground mb-2 md:mb-4 animate-fade-up">
             Teljes kínálat
           </p>
-          <h1 className="text-display-xl animate-fade-up delay-100">
+          <h1 className="text-display-lg md:text-display-xl animate-fade-up delay-100">
             Összes autó
           </h1>
         </div>

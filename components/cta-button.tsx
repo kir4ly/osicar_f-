@@ -1,0 +1,110 @@
+"use client";
+
+import { useState } from "react";
+
+interface CTAButtonProps {
+  href: string;
+  children: React.ReactNode;
+  fullWidth?: boolean;
+  direction?: "right" | "left";
+}
+
+export function CTAButton({ href, children, fullWidth = false, direction = "right" }: CTAButtonProps) {
+  const [isHovered, setIsHovered] = useState(false);
+  const [isPressed, setIsPressed] = useState(false);
+
+  return (
+    <a
+      href={href}
+      className={`group relative ${fullWidth ? 'flex w-full' : 'inline-flex'} items-center justify-center gap-2 overflow-hidden transition-all duration-300 cursor-pointer uppercase text-base font-semibold tracking-tight rounded-full shadow-2xl backdrop-blur-2xl`}
+      style={{
+        '--main-color': 'rgb(52, 118, 234)',
+        '--main-bg-color': 'rgba(52, 118, 234, 0.36)',
+        '--pattern-color': 'rgba(52, 118, 234, 0.073)',
+        filter: isPressed ? 'hue-rotate(250deg)' : 'hue-rotate(0deg)',
+        letterSpacing: '0.3rem',
+        backgroundSize: isHovered ? 'cover, 10px 10px, 10px 10px' : 'cover, 15px 15px, 15px 15px',
+        backgroundPosition: 'center center, center center, center center',
+        borderImage: 'radial-gradient(circle, var(--main-color) 0%, rgba(0, 0, 0, 0) 100%) 1',
+        borderWidth: '1px 0px',
+        borderStyle: 'solid',
+        color: 'var(--main-color)',
+        padding: '0.75rem 1.5rem',
+        fontWeight: 700,
+        fontSize: '0.875rem',
+        boxShadow: isHovered
+          ? '0 0 0 1px rgba(52,118,234,0.35), 0 40px 80px rgba(52,118,234,0.18)'
+          : '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+      } as React.CSSProperties}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => {
+        setIsHovered(false);
+        setIsPressed(false);
+      }}
+      onMouseDown={() => setIsPressed(true)}
+      onMouseUp={() => setIsPressed(false)}
+      onBlur={() => {
+        setIsHovered(false);
+        setIsPressed(false);
+      }}
+    >
+      {direction === "left" && (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="relative z-[1] w-4 h-4 transition-transform duration-300"
+          style={{
+            color: 'var(--main-color)',
+            transform: isHovered ? 'translateX(-8px)' : 'translateX(0)',
+          }}
+        >
+          <path d="M19 12H5"></path>
+          <path d="m12 19-7-7 7-7"></path>
+        </svg>
+      )}
+      <span className="relative z-[1] text-sm">{children}</span>
+      {direction === "right" && (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="relative z-[1] w-4 h-4 transition-transform duration-300"
+          style={{
+            color: 'var(--main-color)',
+            transform: isHovered ? 'translateX(8px)' : 'translateX(0)',
+          }}
+        >
+          <path d="M5 12h14"></path>
+          <path d="m12 5 7 7-7 7"></path>
+        </svg>
+      )}
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 rounded-full transition-all duration-300"
+        style={{
+          opacity: isHovered ? 1 : 0,
+        }}
+      ></span>
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-[1px] rounded-full"
+        style={{
+          background: 'radial-gradient(120% 80% at 50% -20%, rgba(255,255,255,0.28) 0%, rgba(255,255,255,0.06) 55%, rgba(255,255,255,0) 60%), radial-gradient(90% 80% at 50% 120%, rgba(52,118,234,0.18) 0%, rgba(52,118,234,0) 60%)',
+        }}
+      ></span>
+    </a>
+  );
+}

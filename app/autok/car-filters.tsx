@@ -13,6 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { CTAButton } from "@/components/cta-button";
 
 function formatPrice(price: number): string {
   return new Intl.NumberFormat("hu-HU").format(price);
@@ -22,7 +23,7 @@ function formatMileage(mileage: number): string {
   return new Intl.NumberFormat("hu-HU").format(mileage);
 }
 
-type CombinedCar = (Car | CarData) & { isFromSupabase?: boolean };
+type CombinedCar = (Car | CarData) & { isFromSupabase?: boolean; sold?: boolean };
 
 interface CarFiltersProps {
   supabaseCars: CarData[];
@@ -37,13 +38,20 @@ export function CarFilters({ supabaseCars, staticCars }: CarFiltersProps) {
   const [priceRange, setPriceRange] = useState<string>("all");
   const [sortOrder, setSortOrder] = useState<string>("default");
 
-  const allCars: CombinedCar[] = useMemo(() => {
+  // Szétválasztjuk az eladott és nem eladott autókat
+  const { availableCars, soldCars } = useMemo(() => {
     const supabaseWithFlag = supabaseCars.map((car) => ({
       ...car,
       isFromSupabase: true,
     }));
-    return [...supabaseWithFlag, ...staticCars];
+    const all = [...supabaseWithFlag, ...staticCars];
+    return {
+      availableCars: all.filter((car) => !car.sold),
+      soldCars: all.filter((car) => car.sold),
+    };
   }, [supabaseCars, staticCars]);
+
+  const allCars: CombinedCar[] = availableCars;
 
   const allBrands = useMemo(() => {
     const supabaseBrands = supabaseCars.map((car) => car.brand);
@@ -107,19 +115,19 @@ export function CarFilters({ supabaseCars, staticCars }: CarFiltersProps) {
   return (
     <>
       {/* Filters */}
-      <div className="border-t border-b border-foreground/10 py-8 mb-16 animate-fade-up delay-200">
-        <div className="flex flex-col lg:flex-row gap-6">
-          <div className="flex-1">
+      <div className="border-t border-b border-foreground/10 py-4 md:py-8 mb-8 md:mb-16 animate-fade-up delay-200">
+        <div className="flex flex-col gap-4 md:gap-6">
+          <div className="w-full">
             <Input
               placeholder="Keresés márka vagy modell alapján..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="h-12 bg-transparent border-foreground/10 text-base placeholder:text-muted-foreground/50"
+              className="h-10 md:h-12 bg-transparent border-foreground/10 text-sm md:text-base placeholder:text-muted-foreground/50"
             />
           </div>
-          <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2 md:gap-4">
             <Select value={brand} onValueChange={setBrand}>
-              <SelectTrigger className="h-12 bg-transparent border-foreground/10">
+              <SelectTrigger className="h-10 md:h-12 bg-transparent border-foreground/10 text-sm">
                 <SelectValue placeholder="Márka" />
               </SelectTrigger>
               <SelectContent>
@@ -133,7 +141,7 @@ export function CarFilters({ supabaseCars, staticCars }: CarFiltersProps) {
             </Select>
 
             <Select value={fuel} onValueChange={setFuel}>
-              <SelectTrigger className="h-12 bg-transparent border-foreground/10">
+              <SelectTrigger className="h-10 md:h-12 bg-transparent border-foreground/10 text-sm">
                 <SelectValue placeholder="Üzemanyag" />
               </SelectTrigger>
               <SelectContent>
@@ -147,7 +155,7 @@ export function CarFilters({ supabaseCars, staticCars }: CarFiltersProps) {
             </Select>
 
             <Select value={transmission} onValueChange={setTransmission}>
-              <SelectTrigger className="h-12 bg-transparent border-foreground/10">
+              <SelectTrigger className="h-10 md:h-12 bg-transparent border-foreground/10 text-sm">
                 <SelectValue placeholder="Váltó" />
               </SelectTrigger>
               <SelectContent>
@@ -161,7 +169,7 @@ export function CarFilters({ supabaseCars, staticCars }: CarFiltersProps) {
             </Select>
 
             <Select value={priceRange} onValueChange={setPriceRange}>
-              <SelectTrigger className="h-12 bg-transparent border-foreground/10">
+              <SelectTrigger className="h-10 md:h-12 bg-transparent border-foreground/10 text-sm">
                 <SelectValue placeholder="Ár" />
               </SelectTrigger>
               <SelectContent>
@@ -174,7 +182,7 @@ export function CarFilters({ supabaseCars, staticCars }: CarFiltersProps) {
             </Select>
 
             <Select value={sortOrder} onValueChange={setSortOrder}>
-              <SelectTrigger className="h-12 bg-transparent border-foreground/10">
+              <SelectTrigger className="h-10 md:h-12 bg-transparent border-foreground/10 text-sm col-span-2 md:col-span-1">
                 <SelectValue placeholder="Rendezés" />
               </SelectTrigger>
               <SelectContent>
@@ -188,7 +196,7 @@ export function CarFilters({ supabaseCars, staticCars }: CarFiltersProps) {
         {hasFilters && (
           <button
             onClick={clearFilters}
-            className="mt-4 text-sm uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors"
+            className="mt-3 md:mt-4 text-xs md:text-sm uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors"
           >
             Szűrők törlése
           </button>
@@ -196,65 +204,191 @@ export function CarFilters({ supabaseCars, staticCars }: CarFiltersProps) {
       </div>
 
       {/* Results count */}
-      <p className="text-sm text-muted-foreground mb-8 animate-fade-up delay-300">
+      <p className="text-xs md:text-sm text-muted-foreground mb-4 md:mb-8 animate-fade-up delay-300">
         {filteredCars.length} találat
       </p>
 
       {/* Cars Grid */}
       {filteredCars.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-foreground/10">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredCars.map((car, index) => (
-            <Link
+            <div
               key={car.id}
-              href={car.isFromSupabase ? `/autok/db/${car.id}` : `/autok/${car.id}`}
-              className="group bg-background p-6 lg:p-8 hover-lift animate-fade-up"
+              className="group bg-[#0d0d0d] border border-white/[0.08] animate-fade-up flex flex-col"
               style={{ animationDelay: `${(index % 6) * 50 + 300}ms` }}
             >
-              <div className="aspect-[16/10] bg-muted/30 mb-6 overflow-hidden relative">
-                {car.images && car.images.length > 0 && car.images[0] && !car.images[0].includes("placeholder") ? (
-                  <Image
-                    src={car.images[0]}
-                    alt={`${car.brand} ${car.model}`}
-                    fill
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                    className="object-cover group-hover:scale-105 transition-transform duration-700"
-                    loading={index < 6 ? "eager" : "lazy"}
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-foreground/5 to-foreground/10 group-hover:scale-105 transition-transform duration-700">
-                    <span className="text-display-md text-foreground/10">
-                      {car.brand}
-                    </span>
-                  </div>
-                )}
-              </div>
-              <div className="space-y-3">
-                <h3 className="text-display-md">
-                  {car.brand} {car.model}
-                </h3>
-                <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted-foreground">
-                  <span>{car.year}</span>
-                  <span>{formatMileage(car.mileage)} km</span>
-                  <span className="capitalize">{car.fuel}</span>
-                  <span className="capitalize">{car.transmission}</span>
+              {/* Kép évjárat badge-dzsel */}
+              <Link href={car.isFromSupabase ? `/autok/db/${car.id}` : `/autok/${car.id}`}>
+                <div className="aspect-[16/10] bg-muted/30 overflow-hidden relative m-5 mb-0">
+                  {car.images && car.images.length > 0 && car.images[0] && !car.images[0].includes("placeholder") ? (
+                    <Image
+                      src={car.images[0]}
+                      alt={`${car.brand} ${car.model}`}
+                      fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      className="object-cover group-hover:scale-105 transition-transform duration-700"
+                      loading={index < 6 ? "eager" : "lazy"}
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-foreground/5 to-foreground/10 group-hover:scale-105 transition-transform duration-700">
+                      <span className="text-lg md:text-display-md text-foreground/10 font-display uppercase">
+                        {car.brand}
+                      </span>
+                    </div>
+                  )}
                 </div>
-                <p className="text-display-md text-primary">{formatPrice(car.price)} Ft</p>
+              </Link>
+
+              {/* Tartalom */}
+              <div className="p-6 pt-6 flex flex-col flex-1">
+                {/* Név és ár */}
+                <Link href={car.isFromSupabase ? `/autok/db/${car.id}` : `/autok/${car.id}`}>
+                  <h3 className="text-lg md:text-xl font-display uppercase mb-2 tracking-wide">
+                    {car.brand} {car.model}
+                  </h3>
+                  <p className="text-2xl md:text-3xl text-primary font-display mb-6">{formatPrice(car.price)} Ft</p>
+                </Link>
+
+                {/* 2x2 Adatok grid */}
+                <div className="grid grid-cols-2 gap-3 mb-8">
+                  <div className="border border-white/[0.08] px-4 py-4">
+                    <p className="text-xs text-white/40 uppercase tracking-wider mb-2">KM</p>
+                    <p className="text-base font-medium">{formatMileage(car.mileage)} km</p>
+                  </div>
+                  <div className="border border-white/[0.08] px-4 py-4">
+                    <p className="text-xs text-white/40 uppercase tracking-wider mb-2">Üzemanyag</p>
+                    <p className="text-base font-medium capitalize">{car.fuel}</p>
+                  </div>
+                  <div className="border border-white/[0.08] px-4 py-4">
+                    <p className="text-xs text-white/40 uppercase tracking-wider mb-2">Váltó</p>
+                    <p className="text-base font-medium capitalize">{car.transmission}</p>
+                  </div>
+                  <div className="border border-white/[0.08] px-4 py-4">
+                    <p className="text-xs text-white/40 uppercase tracking-wider mb-2">Évjárat</p>
+                    <p className="text-base font-medium">{car.year}</p>
+                  </div>
+                </div>
+
+                {/* Leírás */}
+                {car.description && (
+                  <p className="text-sm text-white/50 mb-8 line-clamp-2 leading-relaxed">
+                    {car.description}
+                  </p>
+                )}
+
+                {/* Spacer hogy a gomb mindig alul legyen */}
+                <div className="flex-1" />
+
+                {/* Megtekintés gomb */}
+                <CTAButton href={car.isFromSupabase ? `/autok/db/${car.id}` : `/autok/${car.id}`} fullWidth>
+                  Megtekintés
+                </CTAButton>
               </div>
-              <div className="h-px bg-foreground/10 mt-6 group-hover:bg-foreground/30 transition-colors duration-500"></div>
-            </Link>
+            </div>
           ))}
         </div>
       ) : (
-        <div className="text-center py-32">
-          <p className="text-display-md text-muted-foreground mb-8">
+        <div className="text-center py-16 md:py-32">
+          <p className="text-lg md:text-display-md text-muted-foreground mb-6 md:mb-8 font-display uppercase">
             Nincs találat
           </p>
           <button
             onClick={clearFilters}
-            className="inline-flex items-center justify-center h-14 px-10 border border-foreground/20 text-sm uppercase tracking-widest hover:bg-foreground/5 transition-colors duration-300"
+            className="inline-flex items-center justify-center h-12 md:h-14 px-8 md:px-10 border border-foreground/20 text-xs md:text-sm uppercase tracking-widest hover:bg-foreground/5 transition-colors duration-300"
           >
             Szűrők törlése
           </button>
+        </div>
+      )}
+
+      {/* Eladva szekció */}
+      {soldCars.length > 0 && (
+        <div className="mt-16 md:mt-32 pt-16 md:pt-32 border-t border-white/[0.08]">
+          <div className="mb-8 md:mb-16">
+            <p className="text-xs md:text-sm uppercase tracking-[0.3em] text-white/40 mb-2 md:mb-4">
+              Korábban eladott
+            </p>
+            <h2 className="text-display-lg md:text-display-xl">
+              Eladva
+            </h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {soldCars.map((car, index) => (
+              <div
+                key={car.id}
+                className="group bg-[#0d0d0d] border border-white/[0.08] opacity-50"
+                style={{ animationDelay: `${(index % 6) * 50}ms` }}
+              >
+                {/* Kép évjárat és eladva badge-dzsel */}
+                <Link href={car.isFromSupabase ? `/autok/db/${car.id}` : `/autok/${car.id}`}>
+                  <div className="aspect-[16/10] bg-muted/30 overflow-hidden relative m-5 mb-0">
+                    {car.images && car.images.length > 0 && car.images[0] && !car.images[0].includes("placeholder") ? (
+                      <Image
+                        src={car.images[0]}
+                        alt={`${car.brand} ${car.model}`}
+                        fill
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        className="object-cover group-hover:scale-105 transition-transform duration-700 grayscale"
+                        loading="lazy"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-foreground/5 to-foreground/10 group-hover:scale-105 transition-transform duration-700">
+                        <span className="text-lg md:text-display-md text-foreground/10 font-display uppercase">
+                          {car.brand}
+                        </span>
+                      </div>
+                    )}
+                    {/* Évjárat badge */}
+                    <div className="absolute top-4 left-4 bg-black/80 backdrop-blur-sm text-white text-sm font-medium px-4 py-2 rounded">
+                      {car.year}
+                    </div>
+                    {/* Eladva badge */}
+                    <div className="absolute top-4 right-4 bg-green-600 text-white text-xs font-bold px-4 py-2 uppercase tracking-wider rounded">
+                      Eladva
+                    </div>
+                  </div>
+                </Link>
+
+                {/* Tartalom */}
+                <div className="p-6 pt-6">
+                  {/* Név és ár */}
+                  <Link href={car.isFromSupabase ? `/autok/db/${car.id}` : `/autok/${car.id}`}>
+                    <h3 className="text-lg md:text-xl font-display uppercase mb-2 tracking-wide text-white/60">
+                      {car.brand} {car.model}
+                    </h3>
+                    <p className="text-2xl md:text-3xl text-white/40 font-display mb-6 line-through">{formatPrice(car.price)} Ft</p>
+                  </Link>
+
+                  {/* 2x2 Adatok grid */}
+                  <div className="grid grid-cols-2 gap-3 mb-8">
+                    <div className="border border-white/[0.08] px-4 py-4">
+                      <p className="text-xs text-white/30 uppercase tracking-wider mb-2">KM</p>
+                      <p className="text-base font-medium text-white/60">{formatMileage(car.mileage)} km</p>
+                    </div>
+                    <div className="border border-white/[0.08] px-4 py-4">
+                      <p className="text-xs text-white/30 uppercase tracking-wider mb-2">Üzemanyag</p>
+                      <p className="text-base font-medium capitalize text-white/60">{car.fuel}</p>
+                    </div>
+                    <div className="border border-white/[0.08] px-4 py-4">
+                      <p className="text-xs text-white/30 uppercase tracking-wider mb-2">Váltó</p>
+                      <p className="text-base font-medium capitalize text-white/60">{car.transmission}</p>
+                    </div>
+                    <div className="border border-white/[0.08] px-4 py-4">
+                      <p className="text-xs text-white/30 uppercase tracking-wider mb-2">Évjárat</p>
+                      <p className="text-base font-medium text-white/60">{car.year}</p>
+                    </div>
+                  </div>
+
+                  {/* Leírás */}
+                  {car.description && (
+                    <p className="text-sm text-white/40 line-clamp-2 leading-relaxed">
+                      {car.description}
+                    </p>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       )}
     </>

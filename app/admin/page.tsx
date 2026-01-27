@@ -11,6 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Plus, X, Upload, Link as LinkIcon, Check } from "lucide-react";
 
 const ADMIN_PASSWORD = "osvath123";
 
@@ -41,9 +42,11 @@ export default function AdminPage() {
     color: "",
     description: "",
     features: "",
-    images: "",
-    featured: false,
   });
+
+  const [imageUrls, setImageUrls] = useState<string[]>([]);
+  const [newImageUrl, setNewImageUrl] = useState("");
+  const [uploadingImage, setUploadingImage] = useState(false);
 
   useEffect(() => {
     const savedAuth = sessionStorage.getItem("adminAuth");
@@ -100,8 +103,7 @@ export default function AdminPage() {
       color: formData.color,
       description: formData.description,
       features: formData.features.split(",").map((f) => f.trim()).filter(Boolean),
-      images: formData.images.split(",").map((i) => i.trim()).filter(Boolean),
-      featured: formData.featured,
+      images: imageUrls,
     };
 
     let error;
@@ -141,6 +143,32 @@ export default function AdminPage() {
     }
   }
 
+  async function toggleSold(car: CarData) {
+    const isCurrentlySold = car.sold;
+
+    // Optimistic update
+    setCars(prevCars =>
+      prevCars.map(c =>
+        c.id === car.id ? { ...c, sold: !isCurrentlySold } : c
+      )
+    );
+
+    const { error } = await supabase
+      .from("cars")
+      .update({ sold: !isCurrentlySold })
+      .eq("id", car.id);
+
+    if (error) {
+      console.error("Error toggling sold:", error);
+      alert("Hiba történt az eladott státusz módosítása során");
+      setCars(prevCars =>
+        prevCars.map(c =>
+          c.id === car.id ? { ...c, sold: isCurrentlySold } : c
+        )
+      );
+    }
+  }
+
   function handleEdit(car: CarData) {
     setEditingCar(car);
     setFormData({
@@ -155,9 +183,8 @@ export default function AdminPage() {
       color: car.color,
       description: car.description,
       features: car.features.join(", "),
-      images: car.images.join(", "),
-      featured: car.featured,
     });
+    setImageUrls(car.images || []);
     setShowForm(true);
   }
 
@@ -175,29 +202,124 @@ export default function AdminPage() {
       color: "",
       description: "",
       features: "",
-      images: "",
-      featured: false,
     });
+    setImageUrls([]);
+    setNewImageUrl("");
     setShowForm(false);
+  }
+
+  function addImageUrl() {
+    if (newImageUrl.trim()) {
+      setImageUrls([...imageUrls, newImageUrl.trim()]);
+      setNewImageUrl("");
+    }
+  }
+
+  function removeImageUrl(index: number) {
+    setImageUrls(imageUrls.filter((_, i) => i !== index));
+  }
+
+  // Kép optimalizálás - átméretezés és tömörítés
+  async function optimizeImage(file: File, maxWidth = 1920, quality = 0.8): Promise<Blob> {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let { width, height } = img;
+
+        // Átméretezés ha túl nagy
+        if (width > maxWidth) {
+          height = (height * maxWidth) / width;
+          width = maxWidth;
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          reject(new Error('Canvas context not available'));
+          return;
+        }
+
+        ctx.drawImage(img, 0, 0, width, height);
+
+        canvas.toBlob(
+          (blob) => {
+            if (blob) {
+              resolve(blob);
+            } else {
+              reject(new Error('Failed to create blob'));
+            }
+          },
+          'image/jpeg',
+          quality
+        );
+      };
+      img.onerror = () => reject(new Error('Failed to load image'));
+      img.src = URL.createObjectURL(file);
+    });
+  }
+
+  async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    setUploadingImage(true);
+
+    for (const file of Array.from(files)) {
+      try {
+        // Kép optimalizálás
+        const optimizedBlob = await optimizeImage(file);
+        const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.jpg`;
+        const filePath = `car-images/${fileName}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from('cars')
+          .upload(filePath, optimizedBlob, {
+            contentType: 'image/jpeg',
+          });
+
+        if (uploadError) {
+          console.error('Upload error:', uploadError);
+          alert(`Hiba a kép feltöltése során: ${uploadError.message}`);
+          continue;
+        }
+
+        const { data: publicUrlData } = supabase.storage
+          .from('cars')
+          .getPublicUrl(filePath);
+
+        if (publicUrlData?.publicUrl) {
+          setImageUrls(prev => [...prev, publicUrlData.publicUrl]);
+        }
+      } catch (err) {
+        console.error('Image optimization error:', err);
+        alert('Hiba a kép feldolgozása során');
+      }
+    }
+
+    setUploadingImage(false);
+    e.target.value = '';
   }
 
   if (!isAuthenticated) {
     return (
-      <div className="grain-overlay min-h-screen pt-32 pb-20">
-        <div className="container mx-auto px-6 lg:px-12">
+      <div className="grain-overlay min-h-screen pt-24 md:pt-32 pb-12 md:pb-20">
+        <div className="container mx-auto px-4 md:px-6 lg:px-12">
           <div className="max-w-md mx-auto">
-            <div className="mb-16 text-center">
-              <p className="text-sm uppercase tracking-[0.3em] text-muted-foreground mb-4 animate-fade-up">
+            <div className="mb-8 md:mb-16 text-center">
+              <p className="text-xs md:text-sm uppercase tracking-[0.3em] text-muted-foreground mb-2 md:mb-4 animate-fade-up">
                 Adminisztráció
               </p>
-              <h1 className="text-display-xl animate-fade-up delay-100">
+              <h1 className="text-display-lg md:text-display-xl animate-fade-up delay-100">
                 Bejelentkezés
               </h1>
             </div>
 
-            <form onSubmit={handleLogin} className="space-y-6 animate-fade-up delay-200">
+            <form onSubmit={handleLogin} className="space-y-4 md:space-y-6 animate-fade-up delay-200">
               <div>
-                <label className="text-sm uppercase tracking-widest text-muted-foreground mb-3 block">
+                <label className="text-xs md:text-sm uppercase tracking-widest text-muted-foreground mb-2 md:mb-3 block">
                   Jelszó
                 </label>
                 <Input
@@ -209,7 +331,7 @@ export default function AdminPage() {
                   }}
                   placeholder="Adja meg a jelszót"
                   required
-                  className={`h-14 bg-transparent border-foreground/10 text-lg ${passwordError ? 'border-red-500' : ''}`}
+                  className={`h-12 md:h-14 bg-transparent border-foreground/10 text-base md:text-lg ${passwordError ? 'border-red-500' : ''}`}
                 />
                 {passwordError && (
                   <p className="text-red-500 text-sm mt-2">Hibás jelszó</p>
@@ -217,7 +339,7 @@ export default function AdminPage() {
               </div>
               <button
                 type="submit"
-                className="w-full inline-flex items-center justify-center h-14 px-10 bg-primary text-primary-foreground text-sm uppercase tracking-widest hover:bg-primary/90 transition-colors duration-300"
+                className="w-full inline-flex items-center justify-center h-12 md:h-14 px-6 md:px-10 bg-primary text-primary-foreground text-xs md:text-sm uppercase tracking-widest hover:bg-primary/90 transition-colors duration-300"
               >
                 Belépés
               </button>
@@ -229,24 +351,24 @@ export default function AdminPage() {
   }
 
   return (
-    <div className="grain-overlay min-h-screen pt-32 pb-20">
-      <div className="container mx-auto px-6 lg:px-12">
-        <div className="mb-16">
-          <p className="text-sm uppercase tracking-[0.3em] text-muted-foreground mb-4 animate-fade-up">
+    <div className="grain-overlay min-h-screen pt-24 md:pt-32 pb-12 md:pb-20">
+      <div className="container mx-auto px-4 md:px-6 lg:px-12">
+        <div className="mb-8 md:mb-16">
+          <p className="text-xs md:text-sm uppercase tracking-[0.3em] text-muted-foreground mb-2 md:mb-4 animate-fade-up">
             Adminisztráció
           </p>
-          <h1 className="text-display-xl animate-fade-up delay-100">
+          <h1 className="text-display-lg md:text-display-xl animate-fade-up delay-100">
             Autó kezelés
           </h1>
         </div>
 
-        <div className="flex gap-4 mb-12 animate-fade-up delay-200">
+        <div className="flex flex-col sm:flex-row gap-3 md:gap-4 mb-8 md:mb-12 animate-fade-up delay-200">
           <button
             onClick={() => {
               resetForm();
               setShowForm(true);
             }}
-            className="inline-flex items-center justify-center h-14 px-10 bg-primary text-primary-foreground text-sm uppercase tracking-widest hover:bg-primary/90 transition-colors duration-300"
+            className="inline-flex items-center justify-center h-12 md:h-14 px-6 md:px-10 bg-primary text-primary-foreground text-xs md:text-sm uppercase tracking-widest hover:bg-primary/90 transition-colors duration-300"
           >
             Új autó hozzáadása
           </button>
@@ -255,30 +377,30 @@ export default function AdminPage() {
               sessionStorage.removeItem("adminAuth");
               setIsAuthenticated(false);
             }}
-            className="inline-flex items-center justify-center h-14 px-10 border border-foreground/20 text-sm uppercase tracking-widest hover:bg-foreground/5 transition-colors duration-300"
+            className="inline-flex items-center justify-center h-12 md:h-14 px-6 md:px-10 border border-foreground/20 text-xs md:text-sm uppercase tracking-widest hover:bg-foreground/5 transition-colors duration-300"
           >
             Kijelentkezés
           </button>
         </div>
 
         {showForm && (
-          <div className="border border-foreground/10 p-8 mb-12 animate-fade-up">
-            <div className="flex justify-between items-center mb-8">
-              <h2 className="text-display-md">
+          <div className="border border-foreground/10 p-4 md:p-8 mb-8 md:mb-12 animate-fade-up">
+            <div className="flex justify-between items-center mb-4 md:mb-8">
+              <h2 className="text-lg md:text-display-md font-display uppercase">
                 {editingCar ? "Autó szerkesztése" : "Új autó"}
               </h2>
               <button
                 onClick={resetForm}
-                className="text-sm uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors"
+                className="text-xs md:text-sm uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors"
               >
                 Bezárás
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                 <div>
-                  <label className="text-sm uppercase tracking-widest text-muted-foreground mb-3 block">
+                  <label className="text-xs md:text-sm uppercase tracking-widest text-muted-foreground mb-2 md:mb-3 block">
                     Márka
                   </label>
                   <Input
@@ -288,11 +410,11 @@ export default function AdminPage() {
                     }
                     placeholder="pl. BMW"
                     required
-                    className="h-14 bg-transparent border-foreground/10 text-lg"
+                    className="h-12 md:h-14 bg-transparent border-foreground/10 text-base md:text-lg"
                   />
                 </div>
                 <div>
-                  <label className="text-sm uppercase tracking-widest text-muted-foreground mb-3 block">
+                  <label className="text-xs md:text-sm uppercase tracking-widest text-muted-foreground mb-2 md:mb-3 block">
                     Modell
                   </label>
                   <Input
@@ -302,11 +424,11 @@ export default function AdminPage() {
                     }
                     placeholder="pl. 320d xDrive"
                     required
-                    className="h-14 bg-transparent border-foreground/10 text-lg"
+                    className="h-12 md:h-14 bg-transparent border-foreground/10 text-base md:text-lg"
                   />
                 </div>
                 <div>
-                  <label className="text-sm uppercase tracking-widest text-muted-foreground mb-3 block">
+                  <label className="text-xs md:text-sm uppercase tracking-widest text-muted-foreground mb-2 md:mb-3 block">
                     Évjárat
                   </label>
                   <Input
@@ -318,11 +440,11 @@ export default function AdminPage() {
                     min={1990}
                     max={new Date().getFullYear() + 1}
                     required
-                    className="h-14 bg-transparent border-foreground/10 text-lg"
+                    className="h-12 md:h-14 bg-transparent border-foreground/10 text-base md:text-lg"
                   />
                 </div>
                 <div>
-                  <label className="text-sm uppercase tracking-widest text-muted-foreground mb-3 block">
+                  <label className="text-xs md:text-sm uppercase tracking-widest text-muted-foreground mb-2 md:mb-3 block">
                     Ár (Ft)
                   </label>
                   <Input
@@ -333,11 +455,11 @@ export default function AdminPage() {
                     }
                     min={0}
                     required
-                    className="h-14 bg-transparent border-foreground/10 text-lg"
+                    className="h-12 md:h-14 bg-transparent border-foreground/10 text-base md:text-lg"
                   />
                 </div>
                 <div>
-                  <label className="text-sm uppercase tracking-widest text-muted-foreground mb-3 block">
+                  <label className="text-xs md:text-sm uppercase tracking-widest text-muted-foreground mb-2 md:mb-3 block">
                     Kilométer
                   </label>
                   <Input
@@ -348,11 +470,11 @@ export default function AdminPage() {
                     }
                     min={0}
                     required
-                    className="h-14 bg-transparent border-foreground/10 text-lg"
+                    className="h-12 md:h-14 bg-transparent border-foreground/10 text-base md:text-lg"
                   />
                 </div>
                 <div>
-                  <label className="text-sm uppercase tracking-widest text-muted-foreground mb-3 block">
+                  <label className="text-xs md:text-sm uppercase tracking-widest text-muted-foreground mb-2 md:mb-3 block">
                     Teljesítmény (LE)
                   </label>
                   <Input
@@ -363,11 +485,11 @@ export default function AdminPage() {
                     }
                     min={0}
                     required
-                    className="h-14 bg-transparent border-foreground/10 text-lg"
+                    className="h-12 md:h-14 bg-transparent border-foreground/10 text-base md:text-lg"
                   />
                 </div>
                 <div>
-                  <label className="text-sm uppercase tracking-widest text-muted-foreground mb-3 block">
+                  <label className="text-xs md:text-sm uppercase tracking-widest text-muted-foreground mb-2 md:mb-3 block">
                     Üzemanyag
                   </label>
                   <Select
@@ -376,7 +498,7 @@ export default function AdminPage() {
                       setFormData({ ...formData, fuel: value })
                     }
                   >
-                    <SelectTrigger className="h-14 bg-transparent border-foreground/10 text-lg">
+                    <SelectTrigger className="h-12 md:h-14 bg-transparent border-foreground/10 text-base md:text-lg">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -388,7 +510,7 @@ export default function AdminPage() {
                   </Select>
                 </div>
                 <div>
-                  <label className="text-sm uppercase tracking-widest text-muted-foreground mb-3 block">
+                  <label className="text-xs md:text-sm uppercase tracking-widest text-muted-foreground mb-2 md:mb-3 block">
                     Váltó
                   </label>
                   <Select
@@ -397,7 +519,7 @@ export default function AdminPage() {
                       setFormData({ ...formData, transmission: value })
                     }
                   >
-                    <SelectTrigger className="h-14 bg-transparent border-foreground/10 text-lg">
+                    <SelectTrigger className="h-12 md:h-14 bg-transparent border-foreground/10 text-base md:text-lg">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -407,7 +529,7 @@ export default function AdminPage() {
                   </Select>
                 </div>
                 <div>
-                  <label className="text-sm uppercase tracking-widest text-muted-foreground mb-3 block">
+                  <label className="text-xs md:text-sm uppercase tracking-widest text-muted-foreground mb-2 md:mb-3 block">
                     Szín
                   </label>
                   <Input
@@ -417,13 +539,13 @@ export default function AdminPage() {
                     }
                     placeholder="pl. Fekete"
                     required
-                    className="h-14 bg-transparent border-foreground/10 text-lg"
+                    className="h-12 md:h-14 bg-transparent border-foreground/10 text-base md:text-lg"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="text-sm uppercase tracking-widest text-muted-foreground mb-3 block">
+                <label className="text-xs md:text-sm uppercase tracking-widest text-muted-foreground mb-2 md:mb-3 block">
                   Leírás
                 </label>
                 <Textarea
@@ -434,12 +556,12 @@ export default function AdminPage() {
                   placeholder="Autó részletes leírása..."
                   rows={4}
                   required
-                  className="bg-transparent border-foreground/10 text-lg resize-none"
+                  className="bg-transparent border-foreground/10 text-base md:text-lg resize-none"
                 />
               </div>
 
               <div>
-                <label className="text-sm uppercase tracking-widest text-muted-foreground mb-3 block">
+                <label className="text-xs md:text-sm uppercase tracking-widest text-muted-foreground mb-2 md:mb-3 block">
                   Felszereltség (vesszővel elválasztva)
                 </label>
                 <Input
@@ -448,51 +570,107 @@ export default function AdminPage() {
                     setFormData({ ...formData, features: e.target.value })
                   }
                   placeholder="pl. Bőr ülések, Navigáció, LED fényszórók"
-                  className="h-14 bg-transparent border-foreground/10 text-lg"
+                  className="h-12 md:h-14 bg-transparent border-foreground/10 text-base md:text-lg"
                 />
               </div>
 
               <div>
-                <label className="text-sm uppercase tracking-widest text-muted-foreground mb-3 block">
-                  Képek URL-jei (vesszővel elválasztva)
+                <label className="text-xs md:text-sm uppercase tracking-widest text-muted-foreground mb-2 md:mb-3 block">
+                  Képek
                 </label>
-                <Input
-                  value={formData.images}
-                  onChange={(e) =>
-                    setFormData({ ...formData, images: e.target.value })
-                  }
-                  placeholder="pl. https://example.com/image1.jpg, https://example.com/image2.jpg"
-                  className="h-14 bg-transparent border-foreground/10 text-lg"
-                />
+
+                {/* Feltöltött képek listája */}
+                {imageUrls.length > 0 && (
+                  <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 md:gap-3 mb-4">
+                    {imageUrls.map((url, index) => (
+                      <div key={index} className="relative group aspect-square">
+                        <img
+                          src={url}
+                          alt={`Kép ${index + 1}`}
+                          className="w-full h-full object-cover border border-foreground/10"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => removeImageUrl(index)}
+                          className="absolute top-1 right-1 p-1 bg-red-500 text-white md:opacity-0 md:group-hover:opacity-100 transition-opacity"
+                        >
+                          <X className="w-3 h-3 md:w-4 md:h-4" />
+                        </button>
+                        <span className="absolute bottom-1 left-1 text-[10px] md:text-xs bg-black/70 text-white px-1 md:px-1.5 py-0.5">
+                          {index + 1}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Kép hozzáadás opciók */}
+                <div className="flex flex-col gap-3 md:gap-4">
+                  {/* URL hozzáadás */}
+                  <div className="flex gap-2">
+                    <div className="flex-1 relative">
+                      <LinkIcon className="absolute left-3 md:left-4 top-1/2 -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-muted-foreground" />
+                      <Input
+                        value={newImageUrl}
+                        onChange={(e) => setNewImageUrl(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault();
+                            addImageUrl();
+                          }
+                        }}
+                        placeholder="Kép URL..."
+                        className="h-12 md:h-14 bg-transparent border-foreground/10 text-base md:text-lg pl-10 md:pl-12"
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={addImageUrl}
+                      disabled={!newImageUrl.trim()}
+                      className="h-12 md:h-14 px-4 md:px-6 bg-foreground/10 hover:bg-foreground/20 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                    >
+                      <Plus className="w-4 h-4 md:w-5 md:h-5" />
+                    </button>
+                  </div>
+
+                  {/* Fájl feltöltés */}
+                  <label className="relative flex items-center justify-center h-12 md:h-14 border border-dashed border-foreground/20 hover:border-foreground/40 transition-colors cursor-pointer">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      onChange={handleImageUpload}
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                      disabled={uploadingImage}
+                    />
+                    <div className="flex items-center gap-2 text-muted-foreground">
+                      <Upload className="w-4 h-4 md:w-5 md:h-5" />
+                      <span className="text-xs md:text-sm uppercase tracking-widest">
+                        {uploadingImage ? "Feltöltés..." : "Képek feltöltése"}
+                      </span>
+                    </div>
+                  </label>
+                </div>
+
+                {imageUrls.length === 0 && (
+                  <p className="text-xs md:text-sm text-muted-foreground mt-2">
+                    Még nincs kép hozzáadva
+                  </p>
+                )}
               </div>
 
-              <div className="flex items-center gap-3">
-                <input
-                  type="checkbox"
-                  id="featured"
-                  checked={formData.featured}
-                  onChange={(e) =>
-                    setFormData({ ...formData, featured: e.target.checked })
-                  }
-                  className="w-5 h-5"
-                />
-                <label htmlFor="featured" className="text-lg">
-                  Kiemelt autó (megjelenik a főoldalon)
-                </label>
-              </div>
-
-              <div className="flex gap-4 pt-4">
+              <div className="flex flex-col sm:flex-row gap-3 md:gap-4 pt-4">
                 <button
                   type="submit"
                   disabled={saving}
-                  className="inline-flex items-center justify-center h-14 px-10 bg-primary text-primary-foreground text-sm uppercase tracking-widest hover:bg-primary/90 transition-colors duration-300 disabled:opacity-50"
+                  className="inline-flex items-center justify-center h-12 md:h-14 px-6 md:px-10 bg-primary text-primary-foreground text-xs md:text-sm uppercase tracking-widest hover:bg-primary/90 transition-colors duration-300 disabled:opacity-50"
                 >
                   {saving ? "Mentés..." : editingCar ? "Mentés" : "Hozzáadás"}
                 </button>
                 <button
                   type="button"
                   onClick={resetForm}
-                  className="inline-flex items-center justify-center h-14 px-10 border border-foreground/20 text-sm uppercase tracking-widest hover:bg-foreground/5 transition-colors duration-300"
+                  className="inline-flex items-center justify-center h-12 md:h-14 px-6 md:px-10 border border-foreground/20 text-xs md:text-sm uppercase tracking-widest hover:bg-foreground/5 transition-colors duration-300"
                 >
                   Mégse
                 </button>
@@ -515,38 +693,52 @@ export default function AdminPage() {
             </p>
           </div>
         ) : (
-          <div className="space-y-4 animate-fade-up delay-300">
-            <p className="text-sm text-muted-foreground mb-8">
-              {cars.length} autó az adatbázisban
-            </p>
-            <div className="grid gap-4">
-              {cars.map((car) => (
+          <div className="space-y-3 md:space-y-4 animate-fade-up delay-300">
+            <div className="mb-4 md:mb-8">
+              <p className="text-xs md:text-sm text-muted-foreground">
+                {cars.filter(c => !c.sold).length} autó az adatbázisban
+              </p>
+            </div>
+            <div className="grid gap-3 md:gap-4">
+              {cars.filter(c => !c.sold).map((car) => (
                 <div
                   key={car.id}
-                  className="border border-foreground/10 p-6 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4"
+                  className="border border-foreground/10 p-4 md:p-6 flex flex-col gap-3 md:gap-4"
                 >
-                  <div className="flex-1">
-                    <h3 className="text-display-md mb-1">
-                      {car.brand} {car.model}
-                    </h3>
-                    <p className="text-muted-foreground">
-                      {car.year} / {car.mileage.toLocaleString("hu-HU")} km /{" "}
-                      {car.fuel} / {car.transmission}
-                    </p>
-                    <p className="text-primary text-lg mt-2">
-                      {formatPrice(car.price)} Ft
-                    </p>
+                  <div className="flex items-start gap-3 md:gap-4">
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-base md:text-display-md mb-0.5 md:mb-1 font-display uppercase truncate">
+                        {car.brand} {car.model}
+                      </h3>
+                      <p className="text-xs md:text-sm text-muted-foreground">
+                        {car.year} / {car.mileage.toLocaleString("hu-HU")} km /{" "}
+                        {car.fuel} / {car.transmission}
+                      </p>
+                      <p className="text-primary text-base md:text-lg mt-1 md:mt-2 font-display">
+                        {formatPrice(car.price)} Ft
+                      </p>
+                    </div>
                   </div>
-                  <div className="flex gap-3">
+                  <div className="flex flex-wrap gap-2 md:gap-3">
                     <button
                       onClick={() => handleEdit(car)}
-                      className="h-10 px-6 border border-foreground/20 text-sm uppercase tracking-widest hover:bg-foreground/5 transition-colors duration-300"
+                      className="h-9 md:h-10 px-4 md:px-6 border border-foreground/20 text-xs md:text-sm uppercase tracking-widest hover:bg-foreground/5 transition-colors duration-300"
                     >
                       Szerkesztés
                     </button>
                     <button
+                      onClick={() => toggleSold(car)}
+                      className={`h-9 md:h-10 px-4 md:px-6 border text-xs md:text-sm uppercase tracking-widest transition-colors duration-300 ${
+                        car.sold
+                          ? 'border-green-500/50 text-green-500 hover:bg-green-500/10'
+                          : 'border-foreground/20 hover:bg-foreground/5'
+                      }`}
+                    >
+                      {car.sold ? 'Visszaállítás' : 'Eladva'}
+                    </button>
+                    <button
                       onClick={() => handleDelete(car.id)}
-                      className="h-10 px-6 border border-red-500/50 text-red-500 text-sm uppercase tracking-widest hover:bg-red-500/10 transition-colors duration-300"
+                      className="h-9 md:h-10 px-4 md:px-6 border border-red-500/50 text-red-500 text-xs md:text-sm uppercase tracking-widest hover:bg-red-500/10 transition-colors duration-300"
                     >
                       Törlés
                     </button>
@@ -554,6 +746,63 @@ export default function AdminPage() {
                 </div>
               ))}
             </div>
+
+            {/* Eladott autók szekció */}
+            {cars.filter(c => c.sold).length > 0 && (
+              <>
+                <div className="border-t border-foreground/10 pt-8 mt-8">
+                  <div className="flex items-center gap-2 mb-4 md:mb-6">
+                    <Check className="w-5 h-5 text-green-500" />
+                    <h3 className="text-lg md:text-display-md font-display uppercase text-green-500">
+                      Eladott autók
+                    </h3>
+                    <span className="text-xs md:text-sm text-muted-foreground">
+                      ({cars.filter(c => c.sold).length} db)
+                    </span>
+                  </div>
+                </div>
+                <div className="grid gap-3 md:gap-4">
+                  {cars.filter(c => c.sold).map((car) => (
+                    <div
+                      key={car.id}
+                      className="border border-green-500/30 bg-green-500/5 p-4 md:p-6 flex flex-col gap-3 md:gap-4 opacity-70"
+                    >
+                      <div className="flex items-start gap-3 md:gap-4">
+                        <div className="mt-0.5 p-1.5 md:p-2">
+                          <Check className="w-5 h-5 md:w-6 md:h-6 text-green-500" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h3 className="text-base md:text-display-md mb-0.5 md:mb-1 font-display uppercase truncate">
+                            {car.brand} {car.model}
+                          </h3>
+                          <p className="text-xs md:text-sm text-muted-foreground">
+                            {car.year} / {car.mileage.toLocaleString("hu-HU")} km /{" "}
+                            {car.fuel} / {car.transmission}
+                          </p>
+                          <p className="text-green-500 text-base md:text-lg mt-1 md:mt-2 font-display line-through">
+                            {formatPrice(car.price)} Ft
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex flex-wrap gap-2 md:gap-3 ml-10 md:ml-14">
+                        <button
+                          onClick={() => toggleSold(car)}
+                          className="h-9 md:h-10 px-4 md:px-6 border border-green-500/50 text-green-500 text-xs md:text-sm uppercase tracking-widest hover:bg-green-500/10 transition-colors duration-300"
+                        >
+                          Visszaállítás
+                        </button>
+                        <button
+                          onClick={() => handleDelete(car.id)}
+                          className="h-9 md:h-10 px-4 md:px-6 border border-red-500/50 text-red-500 text-xs md:text-sm uppercase tracking-widest hover:bg-red-500/10 transition-colors duration-300"
+                        >
+                          Törlés
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
           </div>
         )}
       </div>

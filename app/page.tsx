@@ -1,223 +1,106 @@
-import Link from "next/link";
+import { Suspense } from "react";
 import Image from "next/image";
-import { cars } from "@/lib/data";
+import { cars as staticCars } from "@/lib/data";
+import { createClient } from "@supabase/supabase-js";
+import { CarData } from "@/lib/supabase";
+import { CarFilters } from "./autok/car-filters";
+import { CTAButton } from "@/components/cta-button";
 
-function formatPrice(price: number): string {
-  return new Intl.NumberFormat("hu-HU").format(price);
+// Revalidate every hour
+export const revalidate = 3600;
+
+// Server-side Supabase client
+const supabaseUrl = "https://avtfailpzsnelebpvebz.supabase.co";
+const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF2dGZhaWxwenNuZWxlYnB2ZWJ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk0MzEyMzcsImV4cCI6MjA4NTAwNzIzN30.I4_YUG2OuJJLspKh9v5Fp0rfAiRtzuZfLbWQbOd5rg0";
+
+async function getSupabaseCars(): Promise<CarData[]> {
+  const supabase = createClient(supabaseUrl, supabaseAnonKey);
+  const { data, error } = await supabase
+    .from("cars")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("Error fetching cars:", error);
+    return [];
+  }
+
+  return data || [];
 }
 
-function formatMileage(mileage: number): string {
-  return new Intl.NumberFormat("hu-HU").format(mileage);
-}
-
-export default function HomePage() {
-  const featuredCars = cars.slice(0, 6);
+export default async function HomePage() {
+  const supabaseCars = await getSupabaseCars();
 
   return (
     <div className="grain-overlay">
       {/* Hero Section */}
-      <section id="hero" className="min-h-screen flex flex-col justify-center items-center relative px-6 lg:px-12">
-        <div className="flex flex-col items-center text-center max-w-4xl">
-          <div className="animate-fade-up mb-4">
-            <Image
-              src="/logo.svg"
-              alt="Logo"
-              width={800}
-              height={240}
-              className="h-48 md:h-64 lg:h-80 w-auto"
-              priority
-            />
-          </div>
-          <p className="text-display-md md:text-display-lg text-foreground max-w-2xl mb-2 animate-fade-up delay-200 -mt-16">
+      <section id="hero" className="min-h-screen flex flex-col justify-center items-center relative px-6 lg:px-12 overflow-hidden">
+        {/* Background Image */}
+        <div className="absolute inset-0 z-0">
+          <Image
+            src="/hero-bg.jpg"
+            alt="Mercedes autószállító"
+            fill
+            className="object-cover object-bottom"
+            priority
+            quality={85}
+          />
+          {/* Dark overlay for text readability */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-black/30" />
+        </div>
+
+        <div className="flex flex-col items-center text-center max-w-4xl relative z-10">
+          <h1
+            className="text-3xl md:text-5xl lg:text-6xl font-bold uppercase tracking-wider animate-fade-up mb-2 text-center text-white leading-tight"
+          >
             Megbízható autók, korrekt árak. Legyen könnyű a választás.
-          </p>
-          <p className="text-lg md:text-xl text-primary font-bold animate-fade-up delay-300">
-            Több mint 13 év tapasztalat.
-          </p>
-          <a href="tel:+36706050350" className="call-button mt-8 animate-fade-up delay-400">
-            <div className="points_wrapper">
-              <i className="point"></i>
-              <i className="point"></i>
-              <i className="point"></i>
-              <i className="point"></i>
-              <i className="point"></i>
-              <i className="point"></i>
-              <i className="point"></i>
-              <i className="point"></i>
-              <i className="point"></i>
-              <i className="point"></i>
-            </div>
-            <span className="inner">
-              Hívj minket
-              <svg className="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5">
-                <path d="M5 12h14"></path>
-                <path d="m12 5 7 7-7 7"></path>
-              </svg>
-            </span>
-          </a>
-        </div>
-      </section>
-
-      {/* Featured Cars Section */}
-      <section id="kinálat" className="py-32 border-t border-foreground/10">
-        <div className="container mx-auto px-6 lg:px-12">
-          <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-8 mb-16">
-            <div>
-              <p className="text-sm uppercase tracking-[0.3em] text-muted-foreground mb-4 animate-fade-up">
-                Válogatott kínálat
-              </p>
-              <h2 className="text-display-xl animate-fade-up delay-100">
-                Kiemelt ajánlatok
-              </h2>
-            </div>
-            <Link
-              href="/autok"
-              className="inline-flex items-center justify-center h-12 px-8 border border-foreground/20 text-sm uppercase tracking-widest hover:bg-foreground/5 transition-colors duration-300 animate-fade-up delay-200"
-            >
-              Összes megtekintése
-            </Link>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-foreground/10">
-            {featuredCars.map((car, index) => (
-              <Link
-                key={car.id}
-                href={`/autok/${car.id}`}
-                className="group bg-background p-8 lg:p-12 hover-lift animate-fade-up"
-                style={{ animationDelay: `${(index + 3) * 100}ms` }}
-              >
-                <div className="aspect-[16/10] bg-muted/50 mb-8 overflow-hidden">
-                  <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-foreground/5 to-foreground/10 group-hover:scale-105 transition-transform duration-700">
-                    <span className="text-display-lg text-foreground/10">
-                      {car.brand}
-                    </span>
-                  </div>
-                </div>
-                <div className="flex justify-between items-start mb-4">
-                  <div>
-                    <h3 className="text-display-md mb-1">
-                      {car.brand} {car.model}
-                    </h3>
-                    <p className="text-sm text-muted-foreground uppercase tracking-widest">
-                      {car.year} / {formatMileage(car.mileage)} km
-                    </p>
-                  </div>
-                  <p className="text-display-md text-primary">{formatPrice(car.price)} Ft</p>
-                </div>
-                <div className="h-px bg-foreground/10 group-hover:bg-foreground/30 transition-colors duration-500"></div>
-              </Link>
-            ))}
+          </h1>
+          <div className="mt-4 animate-fade-up delay-300">
+            <CTAButton href="tel:+36706050350">
+              Hívjon minket
+            </CTAButton>
           </div>
         </div>
       </section>
 
-      {/* Services Section */}
-      <section id="szolgaltatasok" className="py-32 border-t border-foreground/10">
-        <div className="container mx-auto px-6 lg:px-12">
-          <div className="max-w-4xl mb-16">
-            <h2 className="text-display-xl mb-4 animate-fade-up">
-              Autók, amikben megbízhatsz
+      {/* Cars Section */}
+      <section id="kinalat" className="py-16 md:py-32 border-t border-foreground/10">
+        <div className="container mx-auto px-4 md:px-6 lg:px-12">
+          <div className="mb-8 md:mb-16">
+            <p className="text-xs md:text-sm uppercase tracking-[0.3em] text-muted-foreground mb-2 md:mb-4 animate-fade-up">
+              Teljes kínálat
+            </p>
+            <h2 className="text-display-lg md:text-display-xl animate-fade-up delay-100">
+              Összes autó
             </h2>
-            <p className="text-xl text-primary animate-fade-up delay-100">
-              Több mint 13 év tapasztalat az autók világában
-            </p>
           </div>
 
-          <div className="space-y-12">
-            <div className="animate-fade-up delay-200">
-              <div className="flex items-start gap-4">
-                <span className="text-primary text-2xl">&#9654;</span>
-                <div>
-                  <h3 className="text-display-md mb-2">Használt autók 99%-ban külföldről</h3>
-                  <p className="text-primary text-lg">
-                    Belgium, Hollandia, Luxemburg, Németország, Franciaország és Olaszország
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="animate-fade-up delay-300">
-              <div className="flex items-start gap-4">
-                <span className="text-primary text-2xl">&#9654;</span>
-                <div>
-                  <h3 className="text-display-md mb-2">Autószállítás & Autómentés</h3>
-                  <p className="text-primary text-lg">
-                    Gyors és megbízható megoldás baj esetén is
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="animate-fade-up delay-400">
-              <div className="flex items-start gap-4">
-                <span className="text-primary text-2xl">&#9654;</span>
-                <div>
-                  <h3 className="text-display-md mb-2">Bérautók</h3>
-                  <p className="text-primary text-lg">
-                    Elérhető személyautók és teherautók rövid vagy hosszú távra
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
+          <Suspense fallback={<CarsLoading />}>
+            <CarFilters supabaseCars={supabaseCars} staticCars={staticCars} />
+          </Suspense>
         </div>
       </section>
-
-      {/* Contact Section */}
-      <section id="kapcsolat" className="py-32 border-t border-foreground/10">
-        <div className="container mx-auto px-6 lg:px-12">
-          <div className="max-w-2xl">
-            <p className="text-sm uppercase tracking-[0.3em] text-muted-foreground mb-4 animate-fade-up">
-              Kapcsolat
-            </p>
-            <h2 className="text-display-xl mb-6 animate-fade-up delay-100">
-              Lépjen velünk kapcsolatba
-            </h2>
-            <p className="text-lg text-muted-foreground mb-16 animate-fade-up delay-200">
-              Kérdése van? Szívesen segítünk. Keressen minket telefonon vagy e-mailben.
-            </p>
-
-            <div className="space-y-12">
-              <div className="animate-fade-up delay-300">
-                <p className="text-sm uppercase tracking-widest text-muted-foreground mb-3">
-                  Telefon
-                </p>
-                <a
-                  href="tel:+36706050350"
-                  className="text-display-md line-hover inline-block text-primary"
-                >
-                  +36 70 605 0350
-                </a>
-              </div>
-
-              <div className="animate-fade-up delay-400">
-                <p className="text-sm uppercase tracking-widest text-muted-foreground mb-3">
-                  Email
-                </p>
-                <a
-                  href="mailto:osvath0911@gmail.com"
-                  className="text-display-md line-hover inline-block text-primary"
-                >
-                  osvath0911@gmail.com
-                </a>
-              </div>
-
-              <div className="animate-fade-up delay-500">
-                <p className="text-sm uppercase tracking-widest text-muted-foreground mb-3">
-                  Cím
-                </p>
-                <p className="text-display-md text-primary">
-                  9500 Celldömölk
-                </p>
-                <p className="text-display-md text-primary">
-                  Magyarország
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
     </div>
+  );
+}
+
+function CarsLoading() {
+  return (
+    <>
+      <div className="border-t border-b border-foreground/10 py-8 mb-16 animate-pulse">
+        <div className="h-12 bg-foreground/5 rounded" />
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-foreground/10">
+        {[...Array(6)].map((_, i) => (
+          <div key={i} className="bg-background p-6 lg:p-8">
+            <div className="aspect-[16/10] bg-foreground/5 mb-6 animate-pulse" />
+            <div className="space-y-3">
+              <div className="h-6 bg-foreground/5 w-3/4 animate-pulse" />
+              <div className="h-4 bg-foreground/5 w-1/2 animate-pulse" />
+            </div>
+          </div>
+        ))}
+      </div>
+    </>
   );
 }

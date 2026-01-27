@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import Image from "next/image";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,63 +12,48 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { CTAButton } from "@/components/cta-button";
 
 const navigation = [
-  { name: "Kínálat", href: "/autok" },
-  { name: "Szolgáltatások", href: "/#szolgaltatasok" },
-  { name: "Kapcsolat", href: "/#kapcsolat" },
+  { name: "Főoldal", href: "/#hero" },
+  { name: "Kínálat", href: "/#kinalat" },
+  { name: "Szolgáltatások", href: "/rolunk#szolgaltatasok" },
+  { name: "Kapcsolat", href: "/rolunk#kapcsolat" },
 ];
 
 export function Header() {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
-  const router = useRouter();
   const isHomePage = pathname === "/";
+
+  // Determine back link based on current path
+  const getBackHref = () => {
+    if (pathname.startsWith("/admin")) return "/";
+    if (pathname.startsWith("/autok/")) return "/";
+    if (pathname.startsWith("/rolunk")) return "/";
+    return "/";
+  };
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background">
-      <div className="container mx-auto flex h-20 items-center px-6 lg:px-12">
-        <div className="flex-1 hidden md:block">
-          {!isHomePage && (
-            <button
-              onClick={() => router.back()}
-              className="inline-flex items-center gap-2 text-sm uppercase tracking-widest text-foreground transition-opacity duration-300 hover:opacity-70"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M19 12H5M12 19l-7-7 7-7" />
-              </svg>
-              Vissza
-            </button>
-          )}
+      <div className="container mx-auto flex h-16 md:h-20 items-center px-4 md:px-6 lg:px-12">
+        {/* Logo bal oldalon */}
+        <div className="flex-1">
+          <Link href="/#hero" className="inline-block">
+            <Image
+              src="/logo.svg"
+              alt="OSICAR Logo"
+              width={280}
+              height={84}
+              className="h-16 md:h-20 w-auto"
+            />
+          </Link>
         </div>
 
         <nav className="hidden md:flex items-center justify-center gap-12">
           {navigation.map((item) => {
-            const isAnchorLink = item.href.startsWith("/#");
-
-            if (isAnchorLink && !isHomePage) {
-              return (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className="text-sm uppercase tracking-widest text-foreground line-hover transition-opacity duration-300 hover:opacity-70"
-                >
-                  {item.name}
-                </Link>
-              );
-            }
-
-            if (isAnchorLink && isHomePage) {
+            // Ha főoldalon vagyunk és a link /#-val kezdődik, akkor anchor link
+            if (isHomePage && item.href.startsWith("/#")) {
               const anchorId = item.href.replace("/#", "");
               return (
                 <a
@@ -80,6 +66,7 @@ export function Header() {
               );
             }
 
+            // Minden más esetben Link komponens
             return (
               <Link
                 key={item.name}
@@ -93,50 +80,10 @@ export function Header() {
         </nav>
 
         <div className="flex-1 hidden md:flex justify-end">
-          <a href="tel:+36706050350" className="call-button">
-            <div className="points_wrapper">
-              <i className="point"></i>
-              <i className="point"></i>
-              <i className="point"></i>
-              <i className="point"></i>
-              <i className="point"></i>
-              <i className="point"></i>
-              <i className="point"></i>
-              <i className="point"></i>
-              <i className="point"></i>
-              <i className="point"></i>
-            </div>
-            <span className="inner">
-              +36 70 605 0350
-              <svg className="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5">
-                <path d="M5 12h14"></path>
-                <path d="m12 5 7 7-7 7"></path>
-              </svg>
-            </span>
-          </a>
+          <CTAButton href="tel:+36706050350">
+            +36 70 605 0350
+          </CTAButton>
         </div>
-
-        {!isHomePage && (
-          <button
-            onClick={() => router.back()}
-            className="md:hidden inline-flex items-center gap-2 text-sm uppercase tracking-widest text-foreground transition-opacity duration-300 hover:opacity-70"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M19 12H5M12 19l-7-7 7-7" />
-            </svg>
-            Vissza
-          </button>
-        )}
 
         <Sheet open={open} onOpenChange={setOpen}>
           <SheetTrigger asChild className="md:hidden ml-auto">
@@ -152,13 +99,13 @@ export function Header() {
               <SheetTitle>Menu</SheetTitle>
             </SheetHeader>
             <div className="flex flex-col h-full justify-between py-12">
-              <nav className="flex flex-col gap-8">
+              <nav className="flex flex-row flex-wrap gap-x-6 gap-y-4">
                 {navigation.map((item, index) => (
                   <Link
                     key={item.name}
                     href={item.href}
                     onClick={() => setOpen(false)}
-                    className="text-display-lg animate-fade-up"
+                    className="text-sm uppercase tracking-widest animate-fade-up"
                     style={{ animationDelay: `${index * 100}ms` }}
                   >
                     {item.name}
