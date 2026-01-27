@@ -38,26 +38,28 @@ export default async function HomePage() {
         {/* Background Image */}
         <div className="absolute inset-0 z-0">
           <Image
-            src="/hero-bg.jpg"
-            alt="Mercedes autószállító"
+            src="/gt63_jobb_hatter.jpg"
+            alt="Mercedes-AMG GT 63"
             fill
-            className="object-cover object-bottom"
+            className="object-cover object-center"
             priority
             quality={85}
           />
-          {/* Dark overlay for text readability */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-black/30" />
+          {/* Dark overlay - stronger on left for text, fading to right */}
+          <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/60 to-black/40" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/30" />
         </div>
 
-        <div className="flex flex-col items-center text-center max-w-4xl relative z-10">
+        <div className="flex flex-col items-center text-center w-full max-w-4xl relative z-10">
           <h1
-            className="text-3xl md:text-5xl lg:text-6xl font-bold uppercase tracking-wider animate-fade-up mb-2 text-center text-white leading-tight"
+            className="font-bold uppercase tracking-wider animate-fade-up mb-2 text-center text-white leading-relaxed"
           >
-            Megbízható autók, korrekt árak. Legyen könnyű a választás.
+            <span className="block whitespace-nowrap text-2xl sm:text-3xl md:text-5xl lg:text-6xl mb-2 md:mb-4">Megbízható autók, korrekt árak.</span>
+            <span className="block whitespace-nowrap text-2xl sm:text-3xl md:text-5xl lg:text-6xl">Legyen könnyű a választás.</span>
           </h1>
-          <div className="mt-4 animate-fade-up delay-300">
-            <CTAButton href="tel:+36706050350">
-              Hívjon minket
+          <div className="mt-6 animate-fade-up delay-300">
+            <CTAButton href="tel:+36706050350" variant="hero">
+              +36 70 605 0350
             </CTAButton>
           </div>
         </div>

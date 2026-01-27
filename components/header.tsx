@@ -35,7 +35,7 @@ export function Header() {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-background">
+    <header className="fixed top-0 left-0 w-full z-50 bg-background">
       <div className="container mx-auto flex h-16 md:h-20 items-center px-4 md:px-6 lg:px-12">
         {/* Logo bal oldalon */}
         <div className="flex-1">

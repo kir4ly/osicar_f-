@@ -116,19 +116,29 @@ export function CarFilters({ supabaseCars, staticCars }: CarFiltersProps) {
   return (
     <>
       {/* Filters */}
-      <div className="border-t border-b border-foreground/10 py-4 md:py-8 mb-8 md:mb-16 animate-fade-up delay-200">
+      <div className="py-4 md:py-8 mb-8 md:mb-16 animate-fade-up delay-200">
         <div className="flex flex-col gap-4 md:gap-6">
           <div className="w-full">
             <Input
               placeholder="Keresés márka vagy modell alapján..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="h-10 md:h-12 bg-transparent border-foreground/10 text-sm md:text-base placeholder:text-muted-foreground/50"
+              className="h-10 md:h-12 bg-transparent text-sm md:text-base placeholder:text-muted-foreground/50 rounded-lg"
+              style={{
+                border: '1px solid rgba(52, 118, 234, 0.35)',
+                boxShadow: '0 0 10px rgba(52, 118, 234, 0.15), 0 0 20px rgba(52, 118, 234, 0.08)'
+              }}
             />
           </div>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2 md:gap-4">
             <Select value={brand} onValueChange={setBrand}>
-              <SelectTrigger className="h-10 md:h-12 bg-transparent border-foreground/10 text-sm">
+              <SelectTrigger
+                className="h-10 md:h-12 bg-transparent text-sm rounded-lg"
+                style={{
+                  border: '1px solid rgba(52, 118, 234, 0.35)',
+                  boxShadow: '0 0 10px rgba(52, 118, 234, 0.15), 0 0 20px rgba(52, 118, 234, 0.08)'
+                }}
+              >
                 <SelectValue placeholder="Márka" />
               </SelectTrigger>
               <SelectContent>
@@ -142,7 +152,13 @@ export function CarFilters({ supabaseCars, staticCars }: CarFiltersProps) {
             </Select>
 
             <Select value={fuel} onValueChange={setFuel}>
-              <SelectTrigger className="h-10 md:h-12 bg-transparent border-foreground/10 text-sm">
+              <SelectTrigger
+                className="h-10 md:h-12 bg-transparent text-sm rounded-lg"
+                style={{
+                  border: '1px solid rgba(52, 118, 234, 0.35)',
+                  boxShadow: '0 0 10px rgba(52, 118, 234, 0.15), 0 0 20px rgba(52, 118, 234, 0.08)'
+                }}
+              >
                 <SelectValue placeholder="Üzemanyag" />
               </SelectTrigger>
               <SelectContent>
@@ -156,7 +172,13 @@ export function CarFilters({ supabaseCars, staticCars }: CarFiltersProps) {
             </Select>
 
             <Select value={transmission} onValueChange={setTransmission}>
-              <SelectTrigger className="h-10 md:h-12 bg-transparent border-foreground/10 text-sm">
+              <SelectTrigger
+                className="h-10 md:h-12 bg-transparent text-sm rounded-lg"
+                style={{
+                  border: '1px solid rgba(52, 118, 234, 0.35)',
+                  boxShadow: '0 0 10px rgba(52, 118, 234, 0.15), 0 0 20px rgba(52, 118, 234, 0.08)'
+                }}
+              >
                 <SelectValue placeholder="Váltó" />
               </SelectTrigger>
               <SelectContent>
@@ -170,7 +192,13 @@ export function CarFilters({ supabaseCars, staticCars }: CarFiltersProps) {
             </Select>
 
             <Select value={priceRange} onValueChange={setPriceRange}>
-              <SelectTrigger className="h-10 md:h-12 bg-transparent border-foreground/10 text-sm">
+              <SelectTrigger
+                className="h-10 md:h-12 bg-transparent text-sm rounded-lg"
+                style={{
+                  border: '1px solid rgba(52, 118, 234, 0.35)',
+                  boxShadow: '0 0 10px rgba(52, 118, 234, 0.15), 0 0 20px rgba(52, 118, 234, 0.08)'
+                }}
+              >
                 <SelectValue placeholder="Ár" />
               </SelectTrigger>
               <SelectContent>
@@ -183,7 +211,13 @@ export function CarFilters({ supabaseCars, staticCars }: CarFiltersProps) {
             </Select>
 
             <Select value={sortOrder} onValueChange={setSortOrder}>
-              <SelectTrigger className="h-10 md:h-12 bg-transparent border-foreground/10 text-sm col-span-2 md:col-span-1">
+              <SelectTrigger
+                className="h-10 md:h-12 bg-transparent text-sm col-span-2 md:col-span-1 rounded-lg"
+                style={{
+                  border: '1px solid rgba(52, 118, 234, 0.35)',
+                  boxShadow: '0 0 10px rgba(52, 118, 234, 0.15), 0 0 20px rgba(52, 118, 234, 0.08)'
+                }}
+              >
                 <SelectValue placeholder="Rendezés" />
               </SelectTrigger>
               <SelectContent>
@@ -215,8 +249,12 @@ export function CarFilters({ supabaseCars, staticCars }: CarFiltersProps) {
           {filteredCars.map((car, index) => (
             <div
               key={car.id}
-              className="group bg-[#0d0d0d] border border-white/[0.08] animate-fade-up flex flex-col"
-              style={{ animationDelay: `${(index % 6) * 50 + 300}ms` }}
+              className="group bg-[#0a0a0a] rounded-xl animate-fade-up flex flex-col transition-all duration-300 hover:shadow-[0_0_25px_rgba(52,118,234,0.25)]"
+              style={{
+                animationDelay: `${(index % 6) * 50 + 300}ms`,
+                border: '1px solid rgba(52, 118, 234, 0.35)',
+                boxShadow: '0 0 10px rgba(52, 118, 234, 0.15), 0 0 20px rgba(52, 118, 234, 0.08)'
+              }}
             >
               {/* Kép évjárat badge-dzsel */}
               <Link href={car.isFromSupabase ? `/autok/db/${car.id}` : `/autok/${car.id}`}>
@@ -247,7 +285,12 @@ export function CarFilters({ supabaseCars, staticCars }: CarFiltersProps) {
                   <h3 className="text-lg md:text-xl font-display uppercase mb-2 tracking-wide">
                     {car.brand} {car.model}
                   </h3>
-                  <p className="text-2xl md:text-3xl text-primary font-display mb-6">{formatPrice(car.price)} Ft</p>
+                  <p
+                    className="text-2xl md:text-3xl text-primary font-display mb-6"
+                    style={{
+                      textShadow: '0 0 10px rgba(52, 118, 234, 0.5), 0 0 20px rgba(52, 118, 234, 0.3), 0 0 30px rgba(52, 118, 234, 0.2)'
+                    }}
+                  >{formatPrice(car.price)} Ft</p>
                 </Link>
 
                 {/* 2x2 Adatok grid */}

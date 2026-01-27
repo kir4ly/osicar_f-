@@ -123,6 +123,15 @@
   }
   body {
     @apply bg-background text-foreground font-sans;
+    overflow-y: scroll !important;
+    margin-right: 0 !important;
+    padding-right: 0 !important;
+  }
+  /* Prevent layout shift when modals/dropdowns open */
+  body[data-scroll-locked] {
+    overflow-y: scroll !important;
+    margin-right: 0 !important;
+    padding-right: 0 !important;
   }
 }
 
@@ -301,6 +310,8 @@
 /* Smooth scrolling */
 html {
   scroll-behavior: smooth;
+  overflow-y: scroll;
+  scrollbar-gutter: stable;
 }
 
 /* Selection color */
