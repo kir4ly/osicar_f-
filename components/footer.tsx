@@ -7,7 +7,7 @@ export const Footer = memo(function Footer() {
     <footer className="border-t border-foreground/10 bg-background">
       <div className="container mx-auto px-4 md:px-6 lg:px-12 pt-8 md:pt-10">
         {/* Navigation */}
-        <nav className="flex flex-row flex-wrap justify-center items-center gap-6 mb-6 md:mb-8">
+        <nav className="flex flex-row flex-wrap justify-center items-center gap-4 md:gap-6 mb-6 md:mb-8">
           <Link
             href="/#hero"
             className="text-sm uppercase tracking-widest text-foreground hover:text-primary transition-colors"
@@ -40,7 +40,7 @@ export const Footer = memo(function Footer() {
 
       <div className="container mx-auto px-4 md:px-6 lg:px-12 py-6 md:py-8">
         {/* Contact info */}
-        <div className="flex flex-col md:flex-row justify-center items-center gap-6 md:gap-12">
+        <div className="flex flex-col items-center gap-4 md:flex-row md:justify-center md:gap-12">
           <a
             href="mailto:osvath0911@gmail.com"
             className="flex items-center gap-3 hover:text-primary transition-colors"

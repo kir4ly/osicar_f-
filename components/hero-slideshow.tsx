@@ -71,13 +71,13 @@ export function HeroSection() {
       </div>
 
       {/* Dot indicators - below hero */}
-      <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 z-20 flex gap-2">
+      <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 z-20 flex gap-1.5 md:gap-2">
         {heroImages.map((_, i) => (
           <button
             key={i}
             onClick={() => goToSlide(i)}
             aria-label={`Kép ${i + 1}`}
-            className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
+            className={`w-1.5 h-1.5 md:w-2.5 md:h-2.5 rounded-full transition-all duration-300 ${
               i === currentIndex
                 ? "bg-white scale-110"
                 : "bg-white/40 hover:bg-white/70"

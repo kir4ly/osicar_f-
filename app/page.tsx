@@ -42,8 +42,8 @@ export default async function HomePage() {
           <h1
             className="font-bold uppercase tracking-wider animate-fade-up mb-2 text-center text-white leading-relaxed"
           >
-            <span className="block whitespace-nowrap text-2xl sm:text-3xl md:text-5xl lg:text-6xl mb-2 md:mb-4">Megbízható autók, korrekt árak.</span>
-            <span className="block whitespace-nowrap text-2xl sm:text-3xl md:text-5xl lg:text-6xl">Legyen könnyű a választás.</span>
+            <span className="block text-xl sm:text-3xl md:text-5xl lg:text-6xl mb-2 md:mb-4">Megbízható autók, korrekt árak.</span>
+            <span className="block text-xl sm:text-3xl md:text-5xl lg:text-6xl">Legyen könnyű a választás.</span>
           </h1>
           <div className="mt-6 animate-fade-up delay-300">
             <CTAButton href="tel:+36706050350" variant="hero">

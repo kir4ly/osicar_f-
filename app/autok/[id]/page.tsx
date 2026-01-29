@@ -39,16 +39,16 @@ export default async function CarDetailPage({
   ];
 
   return (
-    <div className="grain-overlay min-h-screen pt-32 pb-20">
-      <div className="container mx-auto px-6 lg:px-12">
+    <div className="grain-overlay min-h-screen pt-24 md:pt-32 pb-12 md:pb-20">
+      <div className="container mx-auto px-4 md:px-6 lg:px-12">
         {/* Back link */}
-        <div className="mb-12 animate-fade-up">
+        <div className="mb-6 md:mb-12 animate-fade-up">
           <CTAButton href="/#kinalat" direction="left">
             Vissza a kínálathoz
           </CTAButton>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 lg:gap-20">
           {/* Left column - Image */}
           <div className="animate-fade-up delay-100">
             <div className="aspect-[4/3] bg-muted/30 overflow-hidden">
@@ -62,61 +62,61 @@ export default async function CarDetailPage({
 
           {/* Right column - Details */}
           <div>
-            <div className="mb-12 animate-fade-up delay-200">
-              <p className="text-sm uppercase tracking-[0.3em] text-muted-foreground mb-4">
+            <div className="mb-6 md:mb-12 animate-fade-up delay-200">
+              <p className="text-xs md:text-sm uppercase tracking-[0.3em] text-muted-foreground mb-2 md:mb-4">
                 {car.year} / {formatMileage(car.mileage)} km
               </p>
-              <h1 className="text-display-xl mb-6">
+              <h1 className="text-display-lg md:text-display-xl mb-4 md:mb-6">
                 {car.brand} {car.model}
               </h1>
               <p
-                className="text-display-lg text-primary"
+                className="text-display-md md:text-display-lg text-primary"
                 style={{
                   textShadow: '0 0 10px rgba(52, 118, 234, 0.5), 0 0 20px rgba(52, 118, 234, 0.3), 0 0 30px rgba(52, 118, 234, 0.2)'
                 }}
               >{formatPrice(car.price)} Ft</p>
             </div>
 
-            <div className="h-px bg-foreground/10 mb-12 animate-line-expand delay-300"></div>
+            <div className="h-px bg-foreground/10 mb-6 md:mb-12 animate-line-expand delay-300"></div>
 
             {/* Specs */}
-            <div className="grid grid-cols-2 gap-6 mb-12">
+            <div className="grid grid-cols-2 gap-4 md:gap-6 mb-6 md:mb-12">
               {specs.map((spec, index) => (
                 <div
                   key={spec.label}
                   className="animate-fade-up"
                   style={{ animationDelay: `${(index + 4) * 50}ms` }}
                 >
-                  <p className="text-sm uppercase tracking-widest text-muted-foreground mb-2">
+                  <p className="text-xs md:text-sm uppercase tracking-widest text-muted-foreground mb-1 md:mb-2">
                     {spec.label}
                   </p>
-                  <p className="text-lg capitalize">{spec.value}</p>
+                  <p className="text-base md:text-lg capitalize">{spec.value}</p>
                 </div>
               ))}
             </div>
 
-            <div className="h-px bg-foreground/10 mb-12 animate-line-expand delay-500"></div>
+            <div className="h-px bg-foreground/10 mb-6 md:mb-12 animate-line-expand delay-500"></div>
 
             {/* Description */}
-            <div className="mb-12 animate-fade-up delay-600">
-              <p className="text-sm uppercase tracking-widest text-muted-foreground mb-4">
+            <div className="mb-6 md:mb-12 animate-fade-up delay-600">
+              <p className="text-xs md:text-sm uppercase tracking-widest text-muted-foreground mb-2 md:mb-4">
                 Leírás
               </p>
-              <p className="text-lg text-muted-foreground leading-relaxed">
+              <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
                 {car.description}
               </p>
             </div>
 
             {/* Features */}
-            <div className="mb-12 animate-fade-up delay-700">
-              <p className="text-sm uppercase tracking-widest text-muted-foreground mb-4">
+            <div className="mb-6 md:mb-12 animate-fade-up delay-700">
+              <p className="text-xs md:text-sm uppercase tracking-widest text-muted-foreground mb-2 md:mb-4">
                 Felszereltség
               </p>
-              <div className="flex flex-wrap gap-3">
+              <div className="flex flex-wrap gap-2 md:gap-3">
                 {car.features.map((feature) => (
                   <span
                     key={feature}
-                    className="px-4 py-2 border border-foreground/10 text-sm"
+                    className="px-3 md:px-4 py-1.5 md:py-2 border border-foreground/10 text-xs md:text-sm"
                   >
                     {feature}
                   </span>

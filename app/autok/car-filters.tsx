@@ -245,7 +245,7 @@ export function CarFilters({ supabaseCars, staticCars }: CarFiltersProps) {
 
       {/* Cars Grid */}
       {filteredCars.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
           {filteredCars.map((car, index) => (
             <div
               key={car.id}
@@ -258,7 +258,7 @@ export function CarFilters({ supabaseCars, staticCars }: CarFiltersProps) {
             >
               {/* Kép évjárat badge-dzsel */}
               <Link href={car.isFromSupabase ? `/autok/db/${car.id}` : `/autok/${car.id}`}>
-                <div className="aspect-[16/10] bg-muted/30 overflow-hidden relative m-5 mb-0">
+                <div className="aspect-[16/10] bg-muted/30 overflow-hidden relative m-3 md:m-5 mb-0">
                   {car.images && car.images.length > 0 && car.images[0] && !car.images[0].includes("placeholder") ? (
                     <Image
                       src={car.images[0]}
@@ -279,14 +279,14 @@ export function CarFilters({ supabaseCars, staticCars }: CarFiltersProps) {
               </Link>
 
               {/* Tartalom */}
-              <div className="p-6 pt-6 flex flex-col flex-1">
+              <div className="p-4 md:p-6 pt-4 md:pt-6 flex flex-col flex-1">
                 {/* Név és ár */}
                 <Link href={car.isFromSupabase ? `/autok/db/${car.id}` : `/autok/${car.id}`}>
-                  <h3 className="text-lg md:text-xl font-display uppercase mb-2 tracking-wide">
+                  <h3 className="text-base md:text-xl font-display uppercase mb-1 md:mb-2 tracking-wide">
                     {car.brand} {car.model}
                   </h3>
                   <p
-                    className="text-2xl md:text-3xl text-primary font-display mb-6"
+                    className="text-xl md:text-3xl text-primary font-display mb-4 md:mb-6"
                     style={{
                       textShadow: '0 0 10px rgba(52, 118, 234, 0.5), 0 0 20px rgba(52, 118, 234, 0.3), 0 0 30px rgba(52, 118, 234, 0.2)'
                     }}
@@ -294,28 +294,28 @@ export function CarFilters({ supabaseCars, staticCars }: CarFiltersProps) {
                 </Link>
 
                 {/* 2x2 Adatok grid */}
-                <div className="grid grid-cols-2 gap-3 mb-8">
-                  <div className="border border-white/[0.08] px-4 py-4">
-                    <p className="text-xs text-white/40 uppercase tracking-wider mb-2">KM</p>
-                    <p className="text-base font-medium">{formatMileage(car.mileage)} km</p>
+                <div className="grid grid-cols-2 gap-2 md:gap-3 mb-6 md:mb-8">
+                  <div className="border border-white/[0.08] px-3 py-3 md:px-4 md:py-4">
+                    <p className="text-[10px] md:text-xs text-white/40 uppercase tracking-wider mb-1 md:mb-2">KM</p>
+                    <p className="text-sm md:text-base font-medium">{formatMileage(car.mileage)} km</p>
                   </div>
-                  <div className="border border-white/[0.08] px-4 py-4">
-                    <p className="text-xs text-white/40 uppercase tracking-wider mb-2">Üzemanyag</p>
-                    <p className="text-base font-medium capitalize">{car.fuel}</p>
+                  <div className="border border-white/[0.08] px-3 py-3 md:px-4 md:py-4">
+                    <p className="text-[10px] md:text-xs text-white/40 uppercase tracking-wider mb-1 md:mb-2">Üzemanyag</p>
+                    <p className="text-sm md:text-base font-medium capitalize">{car.fuel}</p>
                   </div>
-                  <div className="border border-white/[0.08] px-4 py-4">
-                    <p className="text-xs text-white/40 uppercase tracking-wider mb-2">Váltó</p>
-                    <p className="text-base font-medium capitalize">{car.transmission}</p>
+                  <div className="border border-white/[0.08] px-3 py-3 md:px-4 md:py-4">
+                    <p className="text-[10px] md:text-xs text-white/40 uppercase tracking-wider mb-1 md:mb-2">Váltó</p>
+                    <p className="text-sm md:text-base font-medium capitalize">{car.transmission}</p>
                   </div>
-                  <div className="border border-white/[0.08] px-4 py-4">
-                    <p className="text-xs text-white/40 uppercase tracking-wider mb-2">Évjárat</p>
-                    <p className="text-base font-medium">{car.year}</p>
+                  <div className="border border-white/[0.08] px-3 py-3 md:px-4 md:py-4">
+                    <p className="text-[10px] md:text-xs text-white/40 uppercase tracking-wider mb-1 md:mb-2">Évjárat</p>
+                    <p className="text-sm md:text-base font-medium">{car.year}</p>
                   </div>
                 </div>
 
                 {/* Leírás */}
                 {car.description && (
-                  <p className="text-sm text-white/50 mb-8 line-clamp-2 leading-relaxed">
+                  <p className="text-xs md:text-sm text-white/50 mb-4 md:mb-8 line-clamp-2 leading-relaxed">
                     {car.description}
                   </p>
                 )}

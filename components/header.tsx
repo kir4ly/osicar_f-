@@ -45,7 +45,7 @@ export function Header() {
               alt="OSICAR Logo"
               width={350}
               height={105}
-              className="h-28 md:h-38 w-auto"
+              className="h-14 sm:h-20 md:h-38 w-auto"
             />
           </Link>
         </div>
@@ -99,14 +99,14 @@ export function Header() {
             <SheetHeader className="sr-only">
               <SheetTitle>Menu</SheetTitle>
             </SheetHeader>
-            <div className="flex flex-col h-full justify-between py-12">
-              <nav className="flex flex-row flex-wrap gap-x-6 gap-y-4">
+            <div className="flex flex-col h-full justify-between py-8">
+              <nav className="flex flex-col gap-6">
                 {navigation.map((item, index) => (
                   <Link
                     key={item.name}
                     href={item.href}
                     onClick={() => setOpen(false)}
-                    className="text-sm uppercase tracking-widest animate-fade-up"
+                    className="text-lg uppercase tracking-widest animate-fade-up"
                     style={{ animationDelay: `${index * 100}ms` }}
                   >
                     {item.name}

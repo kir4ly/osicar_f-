@@ -23,7 +23,7 @@ export function CTAButton({ href, children, fullWidth = false, direction = "righ
         '--main-bg-color': 'rgba(52, 118, 234, 0.36)',
         '--pattern-color': 'rgba(52, 118, 234, 0.073)',
         filter: isPressed ? 'hue-rotate(250deg)' : 'hue-rotate(0deg)',
-        letterSpacing: '0.3rem',
+        letterSpacing: '0.15rem',
         backgroundSize: isHovered ? 'cover, 10px 10px, 10px 10px' : 'cover, 15px 15px, 15px 15px',
         backgroundPosition: 'center center, center center, center center',
         backgroundColor: variant === "hero" ? 'rgb(0, 0, 0)' : 'transparent',
@@ -33,9 +33,9 @@ export function CTAButton({ href, children, fullWidth = false, direction = "righ
         borderStyle: 'solid',
         borderRadius: variant === "card" ? '0' : '9999px',
         color: 'var(--main-color)',
-        padding: variant === "hero" ? '1rem 2rem' : '0.75rem 1.5rem',
+        padding: variant === "hero" ? '0.75rem 1.5rem' : '0.625rem 1.25rem',
         fontWeight: 700,
-        fontSize: variant === "hero" ? '1.25rem' : '0.875rem',
+        fontSize: variant === "hero" ? '1rem' : '0.8125rem',
         boxShadow: isHovered
           ? '0 0 0 1px rgba(52,118,234,0.35), 0 40px 80px rgba(52,118,234,0.18)'
           : '0 25px 50px -12px rgba(0, 0, 0, 0.25)',

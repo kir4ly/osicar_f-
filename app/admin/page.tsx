@@ -301,7 +301,7 @@ export default function AdminPage() {
         const filePath = `car-images/${fileName}`;
 
         const { error: uploadError } = await supabase.storage
-          .from('cars')
+          .from('Kepfeltoltes')
           .upload(filePath, optimizedBlob, {
             contentType: 'image/jpeg',
           });
@@ -313,7 +313,7 @@ export default function AdminPage() {
         }
 
         const { data: publicUrlData } = supabase.storage
-          .from('cars')
+          .from('Kepfeltoltes')
           .getPublicUrl(filePath);
 
         if (publicUrlData?.publicUrl) {
