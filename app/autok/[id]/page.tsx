@@ -69,7 +69,12 @@ export default async function CarDetailPage({
               <h1 className="text-display-xl mb-6">
                 {car.brand} {car.model}
               </h1>
-              <p className="text-display-lg text-primary">{formatPrice(car.price)} Ft</p>
+              <p
+                className="text-display-lg text-primary"
+                style={{
+                  textShadow: '0 0 10px rgba(52, 118, 234, 0.5), 0 0 20px rgba(52, 118, 234, 0.3), 0 0 30px rgba(52, 118, 234, 0.2)'
+                }}
+              >{formatPrice(car.price)} Ft</p>
             </div>
 
             <div className="h-px bg-foreground/10 mb-12 animate-line-expand delay-300"></div>
@@ -120,46 +125,14 @@ export default async function CarDetailPage({
             </div>
 
             {/* CTA */}
-            <div className="flex flex-col sm:flex-row gap-4 animate-fade-up delay-800">
-              <Link
-                href={`/kapcsolat?auto=${car.id}`}
-                className="inline-flex items-center justify-center h-14 px-10 bg-primary text-primary-foreground text-sm uppercase tracking-widest hover:bg-primary/90 transition-colors duration-300"
-              >
-                Érdeklődök
-              </Link>
-              <a
-                href="tel:+3612345678"
-                className="inline-flex items-center justify-center h-14 px-10 border border-foreground/20 text-sm uppercase tracking-widest hover:bg-foreground/5 transition-colors duration-300"
-              >
-                +36 1 234 5678
-              </a>
+            <div className="animate-fade-up delay-800 flex justify-center">
+              <CTAButton href="tel:+36706050350">
+                Hívj most
+              </CTAButton>
             </div>
           </div>
         </div>
 
-        {/* Financing section */}
-        <section className="mt-32 border-t border-foreground/10 pt-20">
-          <div className="max-w-2xl">
-            <p className="text-sm uppercase tracking-[0.3em] text-muted-foreground mb-4 animate-fade-up">
-              Finanszírozás
-            </p>
-            <h2 className="text-display-lg mb-8 animate-fade-up delay-100">
-              Havi törlesztő akár
-            </h2>
-            <p className="text-display-xl mb-4 animate-fade-up delay-200 text-primary">
-              {formatPrice(Math.round(car.price / 60))} Ft / hó
-            </p>
-            <p className="text-muted-foreground mb-8 animate-fade-up delay-300">
-              60 hónapos futamidővel, reprezentatív példa
-            </p>
-            <Link
-              href="/kapcsolat?tema=finanszirozas"
-              className="inline-flex items-center text-sm uppercase tracking-widest line-hover animate-fade-up delay-400"
-            >
-              Finanszírozási ajánlat kérése
-            </Link>
-          </div>
-        </section>
       </div>
     </div>
   );

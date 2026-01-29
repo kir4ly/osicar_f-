@@ -37,20 +37,20 @@ export function Header() {
   return (
     <header className="fixed top-0 left-0 w-full z-50 bg-background">
       <div className="container mx-auto flex h-16 md:h-20 items-center px-4 md:px-6 lg:px-12">
-        {/* Logo bal oldalon */}
-        <div className="flex-1">
+        {/* Logo - középen a header széle és a nav között */}
+        <div className="flex-1 flex justify-start">
           <Link href="/#hero" className="inline-block">
             <Image
               src="/logo.svg"
               alt="OSICAR Logo"
-              width={280}
-              height={84}
-              className="h-16 md:h-20 w-auto"
+              width={350}
+              height={105}
+              className="h-28 md:h-38 w-auto"
             />
           </Link>
         </div>
 
-        <nav className="hidden md:flex items-center justify-center gap-12">
+        <nav className="flex-1 hidden md:flex items-center justify-center gap-12">
           {navigation.map((item) => {
             // Ha főoldalon vagyunk és a link /#-val kezdődik, akkor anchor link
             if (isHomePage && item.href.startsWith("/#")) {
@@ -79,6 +79,7 @@ export function Header() {
           })}
         </nav>
 
+        {/* CTA telefon gomb - jobb oldalon */}
         <div className="flex-1 hidden md:flex justify-end">
           <CTAButton href="tel:+36706050350">
             +36 70 605 0350

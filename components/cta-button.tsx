@@ -7,7 +7,7 @@ interface CTAButtonProps {
   children: React.ReactNode;
   fullWidth?: boolean;
   direction?: "right" | "left";
-  variant?: "default" | "hero";
+  variant?: "default" | "hero" | "card";
 }
 
 export function CTAButton({ href, children, fullWidth = false, direction = "right", variant = "default" }: CTAButtonProps) {
@@ -17,7 +17,7 @@ export function CTAButton({ href, children, fullWidth = false, direction = "righ
   return (
     <a
       href={href}
-      className={`group relative ${fullWidth ? 'flex w-full' : 'inline-flex'} items-center justify-center gap-2 overflow-hidden transition-all duration-300 cursor-pointer uppercase text-base font-semibold tracking-tight rounded-full shadow-2xl ${variant === "hero" ? '' : 'backdrop-blur-2xl'}`}
+      className={`group relative ${fullWidth ? 'flex w-full' : 'inline-flex'} items-center justify-center gap-2 overflow-hidden transition-all duration-300 cursor-pointer uppercase text-base font-semibold tracking-tight ${variant === "card" ? '' : 'rounded-full'} shadow-2xl ${variant === "hero" ? '' : 'backdrop-blur-2xl'}`}
       style={{
         '--main-color': 'rgb(52, 118, 234)',
         '--main-bg-color': 'rgba(52, 118, 234, 0.36)',
@@ -27,10 +27,11 @@ export function CTAButton({ href, children, fullWidth = false, direction = "righ
         backgroundSize: isHovered ? 'cover, 10px 10px, 10px 10px' : 'cover, 15px 15px, 15px 15px',
         backgroundPosition: 'center center, center center, center center',
         backgroundColor: variant === "hero" ? 'rgb(0, 0, 0)' : 'transparent',
-        border: variant === "hero" ? '1px solid rgba(52, 118, 234, 0.5)' : 'none',
-        borderImage: variant === "hero" ? 'none' : 'radial-gradient(circle, var(--main-color) 0%, rgba(0, 0, 0, 0) 100%) 1',
-        borderWidth: variant === "hero" ? '1px' : '1px 0px',
+        border: variant === "card" ? 'none' : '1px solid rgba(52, 118, 234, 0.5)',
+        borderImage: variant === "card" ? 'radial-gradient(circle, var(--main-color) 0%, rgba(0, 0, 0, 0) 100%) 1' : 'none',
+        borderWidth: variant === "card" ? '1px 0px' : '1px',
         borderStyle: 'solid',
+        borderRadius: variant === "card" ? '0' : '9999px',
         color: 'var(--main-color)',
         padding: variant === "hero" ? '1rem 2rem' : '0.75rem 1.5rem',
         fontWeight: 700,
@@ -96,14 +97,14 @@ export function CTAButton({ href, children, fullWidth = false, direction = "righ
       )}
       <span
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 rounded-full transition-all duration-300"
+        className={`pointer-events-none absolute inset-0 ${variant === "card" ? '' : 'rounded-full'} transition-all duration-300`}
         style={{
           opacity: isHovered ? 1 : 0,
         }}
       ></span>
       <span
         aria-hidden="true"
-        className="pointer-events-none absolute inset-[1px] rounded-full"
+        className={`pointer-events-none absolute inset-[1px] ${variant === "card" ? '' : 'rounded-full'}`}
         style={{
           background: 'radial-gradient(120% 80% at 50% -20%, rgba(255,255,255,0.28) 0%, rgba(255,255,255,0.06) 55%, rgba(255,255,255,0) 60%), radial-gradient(90% 80% at 50% 120%, rgba(52,118,234,0.18) 0%, rgba(52,118,234,0) 60%)',
         }}

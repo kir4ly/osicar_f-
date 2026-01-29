@@ -1,10 +1,10 @@
 import { Suspense } from "react";
-import Image from "next/image";
 import { cars as staticCars } from "@/lib/data";
 import { createClient } from "@supabase/supabase-js";
 import { CarData } from "@/lib/supabase";
 import { CarFilters } from "./autok/car-filters";
 import { CTAButton } from "@/components/cta-button";
+import { HeroSection } from "@/components/hero-slideshow";
 
 // Revalidate every hour
 export const revalidate = 3600;
@@ -34,21 +34,9 @@ export default async function HomePage() {
   return (
     <div className="grain-overlay">
       {/* Hero Section */}
-      <section id="hero" className="min-h-screen flex flex-col justify-center items-center relative px-6 lg:px-12 overflow-hidden">
-        {/* Background Image */}
-        <div className="absolute inset-0 z-0">
-          <Image
-            src="/gt63_jobb_hatter.jpg"
-            alt="Mercedes-AMG GT 63"
-            fill
-            className="object-cover object-center"
-            priority
-            quality={85}
-          />
-          {/* Dark overlay - stronger on left for text, fading to right */}
-          <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/60 to-black/40" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/30" />
-        </div>
+      <section id="hero" className="min-h-screen flex flex-col justify-center items-center relative px-6 lg:px-12 overflow-hidden mb-10">
+        {/* Background Slideshow */}
+        <HeroSection />
 
         <div className="flex flex-col items-center text-center w-full max-w-4xl relative z-10">
           <h1

@@ -32,7 +32,12 @@ export const CarCard = memo(function CarCard({ car }: { car: Car }) {
           <h3 className="font-semibold text-lg">
             {car.brand} {car.model}
           </h3>
-          <p className="text-2xl font-bold text-primary">{formatPrice(car.price)}</p>
+          <p
+            className="text-2xl font-bold text-primary"
+            style={{
+              textShadow: '0 0 10px rgba(52, 118, 234, 0.5), 0 0 20px rgba(52, 118, 234, 0.3), 0 0 30px rgba(52, 118, 234, 0.2)'
+            }}
+          >{formatPrice(car.price)}</p>
         </div>
         <div className="grid grid-cols-2 gap-2 text-sm text-muted-foreground">
           <div className="flex items-center gap-1.5">

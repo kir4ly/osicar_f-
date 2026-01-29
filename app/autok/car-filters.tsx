@@ -324,7 +324,7 @@ export function CarFilters({ supabaseCars, staticCars }: CarFiltersProps) {
                 <div className="flex-1" />
 
                 {/* Megtekintés gomb */}
-                <CTAButton href={car.isFromSupabase ? `/autok/db/${car.id}` : `/autok/${car.id}`} fullWidth>
+                <CTAButton href={car.isFromSupabase ? `/autok/db/${car.id}` : `/autok/${car.id}`} fullWidth variant="card">
                   Megtekintés
                 </CTAButton>
               </div>
