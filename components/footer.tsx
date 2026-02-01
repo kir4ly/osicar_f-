@@ -42,6 +42,15 @@ export const Footer = memo(function Footer() {
         {/* Contact info */}
         <div className="flex flex-col items-center gap-4 md:flex-row md:justify-center md:gap-12">
           <a
+            href="https://www.facebook.com/profile.php?id=61579638051644"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-3 hover:text-primary transition-colors"
+          >
+            <Facebook className="w-5 h-5 text-primary" />
+            <span className="text-sm md:text-base">Facebook</span>
+          </a>
+          <a
             href="mailto:osvath0911@gmail.com"
             className="flex items-center gap-3 hover:text-primary transition-colors"
           >
@@ -54,15 +63,6 @@ export const Footer = memo(function Footer() {
           >
             <Phone className="w-5 h-5 text-primary" />
             <span className="text-sm md:text-base">+36 70 605 0350</span>
-          </a>
-          <a
-            href="https://www.facebook.com/profile.php?id=61579638051644"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-3 hover:text-primary transition-colors"
-          >
-            <Facebook className="w-5 h-5 text-primary" />
-            <span className="text-sm md:text-base">Facebook</span>
           </a>
           <div className="flex items-center gap-3">
             <MapPin className="w-5 h-5 text-primary" />
