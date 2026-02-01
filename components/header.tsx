@@ -95,12 +95,12 @@ export function Header() {
               </div>
             </button>
           </SheetTrigger>
-          <SheetContent side="right" className="bg-background border-border w-full" showCloseButton={false}>
+          <SheetContent side="right" className="bg-background border-border" showCloseButton={false}>
             <SheetHeader className="sr-only">
               <SheetTitle>Menu</SheetTitle>
             </SheetHeader>
-            <div className="flex flex-col h-full justify-between py-8">
-              <nav className="flex flex-col gap-6">
+            <div className="flex flex-col h-full items-center justify-center py-8">
+              <nav className="flex flex-col items-center gap-6">
                 {navigation.map((item, index) => (
                   <Link
                     key={item.name}
@@ -113,10 +113,10 @@ export function Header() {
                   </Link>
                 ))}
               </nav>
-              <div className="space-y-4">
+              <div className="mt-auto space-y-4 w-full px-4">
                 <a
                   href="tel:+36706050350"
-                  className="block text-lg text-muted-foreground"
+                  className="block text-center text-lg text-muted-foreground"
                 >
                   +36 70 605 0350
                 </a>

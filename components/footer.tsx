@@ -7,7 +7,7 @@ export const Footer = memo(function Footer() {
     <footer className="border-t border-foreground/10 bg-background">
       <div className="container mx-auto px-4 md:px-6 lg:px-12 pt-8 md:pt-10">
         {/* Navigation */}
-        <nav className="flex flex-row flex-wrap justify-center items-center gap-4 md:gap-6 mb-6 md:mb-8">
+        <nav className="flex flex-col sm:flex-row flex-wrap justify-center items-center gap-4 md:gap-6 mb-6 md:mb-8">
           <Link
             href="/#hero"
             className="text-sm uppercase tracking-widest text-foreground hover:text-primary transition-colors"
