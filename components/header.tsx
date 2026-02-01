@@ -79,10 +79,10 @@ export function Header() {
           })}
         </nav>
 
-        {/* CTA telefon gomb - jobb oldalon */}
+        {/* CTA ajánlatkérés gomb - jobb oldalon */}
         <div className="flex-1 hidden md:flex justify-end">
           <CTAButton href="tel:+36706050350">
-            +36 70 605 0350
+            Ajánlatkérés
           </CTAButton>
         </div>
 
