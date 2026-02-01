@@ -113,20 +113,14 @@ export function Header() {
                   </Link>
                 ))}
               </nav>
-              <div className="mt-auto space-y-4 w-full px-4">
-                <a
-                  href="tel:+36706050350"
-                  className="block text-center text-lg text-muted-foreground"
-                >
-                  +36 70 605 0350
-                </a>
+              <div className="mt-auto w-full px-4">
                 <Button
                   asChild
                   className="w-full h-14 text-base uppercase tracking-widest"
                 >
-                  <Link href="/kapcsolat" onClick={() => setOpen(false)}>
+                  <a href="tel:+36706050350" onClick={() => setOpen(false)}>
                     Ajánlatkérés
-                  </Link>
+                  </a>
                 </Button>
               </div>
             </div>
