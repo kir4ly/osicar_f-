@@ -119,7 +119,7 @@ export function Header() {
                   className="w-full h-14 text-base uppercase tracking-widest"
                 >
                   <a href="tel:+36706050350" onClick={() => setOpen(false)}>
-                    Ajánlatkérés
+                    +36 70 605 0350
                   </a>
                 </Button>
               </div>
