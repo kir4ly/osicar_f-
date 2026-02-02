@@ -98,8 +98,8 @@ export function HeroSection() {
         <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent md:from-black/50 md:via-transparent md:to-black/30" />
       </div>
 
-      {/* Dot indicators */}
-      <div className="absolute bottom-3 md:-bottom-10 left-1/2 -translate-x-1/2 z-20 flex gap-1.5 md:gap-2">
+      {/* Dot indicators - hidden on mobile */}
+      <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 z-20 hidden md:flex gap-2">
         {heroImages.map((_, i) => (
           <button
             key={i}

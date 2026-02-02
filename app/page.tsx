@@ -37,13 +37,13 @@ export default async function HomePage() {
       {/* Mobile: stacked layout (image then text below). Desktop: overlay layout */}
       <section id="hero" className="flex flex-col md:min-h-screen md:justify-end md:items-start md:relative md:px-6 lg:px-12 overflow-hidden mb-10 md:pb-48">
         {/* Background Slideshow - mobile: relative container, desktop: absolute fill */}
-        <div className="relative w-full aspect-[16/10] md:aspect-auto md:absolute md:inset-0">
+        <div className="relative w-full aspect-[2/1] md:aspect-auto md:absolute md:inset-0">
           <HeroSection />
         </div>
 
-        <div className="flex flex-col items-start text-left w-full max-w-4xl relative z-10 px-6 py-8 md:px-0 md:py-0">
+        <div className="flex flex-col items-center text-center md:items-start md:text-left w-full max-w-4xl relative z-10 px-6 py-8 md:px-0 md:py-0">
           <h1
-            className="font-light uppercase tracking-wider animate-fade-up mb-2 text-left text-white leading-relaxed"
+            className="font-light uppercase tracking-wider animate-fade-up mb-2 text-white leading-relaxed"
           >
             <span className="block text-lg sm:text-2xl md:text-3xl lg:text-4xl mb-2 md:mb-3">Megbízható autók, korrekt árak.</span>
             <span className="block text-lg sm:text-2xl md:text-3xl lg:text-4xl">Legyen könnyű a választás.</span>
