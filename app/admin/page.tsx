@@ -261,13 +261,45 @@ export default function AdminPage() {
 
   // Kép optimalizálás - átméretezés és tömörítés
   async function optimizeImage(file: File, maxWidth = 1920, quality = 0.8): Promise<Blob> {
+    // createImageBitmap jól kezeli az EXIF orientációt és a legtöbb formátumot (HEIC is iOS-en)
+    if (typeof createImageBitmap !== 'undefined') {
+      try {
+        const bitmap = await createImageBitmap(file);
+        const canvas = document.createElement('canvas');
+        let { width, height } = bitmap;
+
+        if (width > maxWidth) {
+          height = (height * maxWidth) / width;
+          width = maxWidth;
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+
+        const ctx = canvas.getContext('2d');
+        if (!ctx) throw new Error('Canvas context not available');
+
+        ctx.drawImage(bitmap, 0, 0, width, height);
+        bitmap.close();
+
+        return await new Promise<Blob>((resolve, reject) => {
+          canvas.toBlob(
+            (blob) => blob ? resolve(blob) : reject(new Error('Failed to create blob')),
+            'image/jpeg',
+            quality
+          );
+        });
+      } catch {
+        // Fallback to Image element method
+      }
+    }
+
     return new Promise((resolve, reject) => {
-      const img = new Image();
+      const img = new window.Image();
       img.onload = () => {
         const canvas = document.createElement('canvas');
         let { width, height } = img;
 
-        // Átméretezés ha túl nagy
         if (width > maxWidth) {
           height = (height * maxWidth) / width;
           width = maxWidth;
@@ -283,20 +315,18 @@ export default function AdminPage() {
         }
 
         ctx.drawImage(img, 0, 0, width, height);
+        URL.revokeObjectURL(img.src);
 
         canvas.toBlob(
-          (blob) => {
-            if (blob) {
-              resolve(blob);
-            } else {
-              reject(new Error('Failed to create blob'));
-            }
-          },
+          (blob) => blob ? resolve(blob) : reject(new Error('Failed to create blob')),
           'image/jpeg',
           quality
         );
       };
-      img.onerror = () => reject(new Error('Failed to load image'));
+      img.onerror = () => {
+        URL.revokeObjectURL(img.src);
+        reject(new Error('Failed to load image'));
+      };
       img.src = URL.createObjectURL(file);
     });
   }
@@ -309,15 +339,28 @@ export default function AdminPage() {
 
     for (const file of Array.from(files)) {
       try {
-        // Kép optimalizálás
-        const optimizedBlob = await optimizeImage(file);
-        const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.jpg`;
+        let uploadBlob: Blob;
+        let contentType: string;
+        let ext: string;
+
+        try {
+          uploadBlob = await optimizeImage(file);
+          contentType = 'image/jpeg';
+          ext = 'jpg';
+        } catch {
+          // Ha az optimalizálás nem sikerül (pl. HEIC nem támogatott), feltöltjük az eredetit
+          uploadBlob = file;
+          contentType = file.type || 'image/jpeg';
+          ext = file.name.split('.').pop()?.toLowerCase() || 'jpg';
+        }
+
+        const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${ext}`;
         const filePath = `car-images/${fileName}`;
 
         const { error: uploadError } = await supabase.storage
           .from('Kepfeltoltes')
-          .upload(filePath, optimizedBlob, {
-            contentType: 'image/jpeg',
+          .upload(filePath, uploadBlob, {
+            contentType,
           });
 
         if (uploadError) {
@@ -334,8 +377,8 @@ export default function AdminPage() {
           setImageUrls(prev => [...prev, publicUrlData.publicUrl]);
         }
       } catch (err) {
-        console.error('Image optimization error:', err);
-        alert('Hiba a kép feldolgozása során');
+        console.error('Image upload error:', err);
+        alert('Hiba a kép feltöltése során');
       }
     }
 
