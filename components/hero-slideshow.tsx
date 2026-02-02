@@ -46,7 +46,7 @@ export function HeroSection() {
   }, [currentIndex, goToSlide]);
 
   useEffect(() => {
-    const timer = setInterval(advance, 7000);
+    const timer = setInterval(advance, 3500);
     return () => clearInterval(timer);
   }, [advance]);
 
