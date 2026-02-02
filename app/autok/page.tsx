@@ -4,8 +4,8 @@ import { createClient } from "@supabase/supabase-js";
 import { CarData } from "@/lib/supabase";
 import { CarFilters } from "./car-filters";
 
-// Revalidate every hour
-export const revalidate = 3600;
+// Revalidate every 60 seconds as fallback
+export const revalidate = 60;
 
 // Server-side Supabase client
 const supabaseUrl = "https://avtfailpzsnelebpvebz.supabase.co";

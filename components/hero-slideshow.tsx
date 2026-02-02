@@ -3,13 +3,29 @@
 import Image from "next/image";
 import { useState, useEffect, useCallback } from "react";
 
-const HERO_COUNT = 17;
-const heroImages = Array.from({ length: HERO_COUNT }, (_, i) => `/hero/hero-${HERO_COUNT - i}.jpg`);
+const HERO_COUNT = 12;
+const heroImagesSorted = Array.from({ length: HERO_COUNT }, (_, i) => `/hero/hero-${i + 1}.png`);
+
+// Fisher-Yates shuffle for random order
+function shuffle<T>(arr: T[]): T[] {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
 
 export function HeroSection() {
+  const [heroImages] = useState(() => shuffle(heroImagesSorted));
   const [currentIndex, setCurrentIndex] = useState(0);
   const [nextIndex, setNextIndex] = useState(1);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const goToSlide = useCallback(
     (index: number) => {
@@ -34,6 +50,18 @@ export function HeroSection() {
     return () => clearInterval(timer);
   }, [advance]);
 
+  if (!mounted) {
+    return (
+      <>
+        <div className="absolute inset-0 z-0">
+          <div className="absolute inset-0 bg-black" />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/60 to-black/40" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/30" />
+        </div>
+      </>
+    );
+  }
+
   return (
     <>
       {/* Background images */}
@@ -42,21 +70,21 @@ export function HeroSection() {
           src={heroImages[currentIndex]}
           alt="OSICAR prémium használt autó"
           fill
-          className="object-cover object-center"
-          priority={currentIndex === 0}
+          className="object-contain md:object-cover object-center md:object-bottom"
+          priority
           sizes="100vw"
-          quality={75}
+          quality={100}
         />
 
         <Image
           src={heroImages[nextIndex]}
           alt="OSICAR prémium használt autó"
           fill
-          className={`object-cover object-center transition-opacity duration-[1200ms] ease-in-out ${
+          className={`object-contain md:object-cover object-center md:object-bottom transition-opacity duration-[1200ms] ease-in-out ${
             isTransitioning ? "opacity-100" : "opacity-0"
           }`}
           sizes="100vw"
-          quality={75}
+          quality={100}
         />
 
         <link
@@ -65,13 +93,13 @@ export function HeroSection() {
           href={heroImages[(currentIndex + 2) % heroImages.length]}
         />
 
-        {/* Dark overlays for text readability */}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/60 to-black/40" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/30" />
+        {/* Dark overlays for text readability - lighter on mobile since text is below */}
+        <div className="absolute inset-0 bg-gradient-to-r from-black/30 via-black/10 to-transparent md:from-black/85 md:via-black/60 md:to-black/40" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent md:from-black/50 md:via-transparent md:to-black/30" />
       </div>
 
-      {/* Dot indicators - below hero */}
-      <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 z-20 flex gap-1.5 md:gap-2">
+      {/* Dot indicators */}
+      <div className="absolute bottom-3 md:-bottom-10 left-1/2 -translate-x-1/2 z-20 flex gap-1.5 md:gap-2">
         {heroImages.map((_, i) => (
           <button
             key={i}

@@ -6,8 +6,8 @@ import { CarFilters } from "./autok/car-filters";
 import { CTAButton } from "@/components/cta-button";
 import { HeroSection } from "@/components/hero-slideshow";
 
-// Revalidate every hour
-export const revalidate = 3600;
+// Revalidate every 60 seconds as fallback
+export const revalidate = 60;
 
 // Server-side Supabase client
 const supabaseUrl = "https://avtfailpzsnelebpvebz.supabase.co";
@@ -34,16 +34,19 @@ export default async function HomePage() {
   return (
     <div className="grain-overlay">
       {/* Hero Section */}
-      <section id="hero" className="min-h-screen flex flex-col justify-center items-center relative px-6 lg:px-12 overflow-hidden mb-10">
-        {/* Background Slideshow */}
-        <HeroSection />
+      {/* Mobile: stacked layout (image then text below). Desktop: overlay layout */}
+      <section id="hero" className="flex flex-col md:min-h-screen md:justify-end md:items-start md:relative md:px-6 lg:px-12 overflow-hidden mb-10 md:pb-48">
+        {/* Background Slideshow - mobile: relative container, desktop: absolute fill */}
+        <div className="relative w-full aspect-[16/10] md:aspect-auto md:absolute md:inset-0">
+          <HeroSection />
+        </div>
 
-        <div className="flex flex-col items-center text-center w-full max-w-4xl relative z-10">
+        <div className="flex flex-col items-start text-left w-full max-w-4xl relative z-10 px-6 py-8 md:px-0 md:py-0">
           <h1
-            className="font-bold uppercase tracking-wider animate-fade-up mb-2 text-center text-white leading-relaxed"
+            className="font-light uppercase tracking-wider animate-fade-up mb-2 text-left text-white leading-relaxed"
           >
-            <span className="block text-xl sm:text-3xl md:text-5xl lg:text-6xl mb-2 md:mb-4">Megbízható autók, korrekt árak.</span>
-            <span className="block text-xl sm:text-3xl md:text-5xl lg:text-6xl">Legyen könnyű a választás.</span>
+            <span className="block text-lg sm:text-2xl md:text-3xl lg:text-4xl mb-2 md:mb-3">Megbízható autók, korrekt árak.</span>
+            <span className="block text-lg sm:text-2xl md:text-3xl lg:text-4xl">Legyen könnyű a választás.</span>
           </h1>
           <div className="mt-6 animate-fade-up delay-300">
             <CTAButton href="tel:+36706050350" variant="hero">

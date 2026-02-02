@@ -346,9 +346,17 @@ html {
 }
 
 /* Prevent horizontal overflow on mobile */
-html, body {
-  overflow-x: hidden;
-  max-width: 100vw;
+html {
+  overflow-x: clip;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  overflow-x: clip;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
 }
 
 /* Call Button */

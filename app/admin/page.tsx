@@ -15,6 +15,14 @@ import { Plus, X, Upload, Link as LinkIcon, Check, PackageCheck } from "lucide-r
 
 const ADMIN_PASSWORD = "osvath123";
 
+async function triggerRevalidation() {
+  try {
+    await fetch("/api/revalidate", { method: "POST" });
+  } catch (e) {
+    console.error("Revalidation failed:", e);
+  }
+}
+
 function formatPrice(price: number): string {
   return new Intl.NumberFormat("hu-HU").format(price);
 }
@@ -126,6 +134,7 @@ export default function AdminPage() {
     } else {
       resetForm();
       fetchCars();
+      await triggerRevalidation();
     }
     setSaving(false);
   }
@@ -140,6 +149,7 @@ export default function AdminPage() {
       alert("Hiba történt a törlés során");
     } else {
       fetchCars();
+      await triggerRevalidation();
     }
   }
 
@@ -166,6 +176,8 @@ export default function AdminPage() {
           c.id === car.id ? { ...c, sold: isCurrentlySold } : c
         )
       );
+    } else {
+      await triggerRevalidation();
     }
   }
 
@@ -192,6 +204,8 @@ export default function AdminPage() {
           c.id === car.id ? { ...c, fulfilled: isCurrentlyFulfilled } : c
         )
       );
+    } else {
+      await triggerRevalidation();
     }
   }
 
