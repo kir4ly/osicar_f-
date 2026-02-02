@@ -70,7 +70,7 @@ export function HeroSection() {
           src={heroImages[currentIndex]}
           alt="OSICAR prémium használt autó"
           fill
-          className="object-cover object-bottom"
+          className="object-cover object-center"
           priority
           sizes="100vw"
           quality={100}
@@ -80,7 +80,7 @@ export function HeroSection() {
           src={heroImages[nextIndex]}
           alt="OSICAR prémium használt autó"
           fill
-          className={`object-cover object-bottom transition-opacity duration-[1200ms] ease-in-out ${
+          className={`object-cover object-center transition-opacity duration-[1200ms] ease-in-out ${
             isTransitioning ? "opacity-100" : "opacity-0"
           }`}
           sizes="100vw"

@@ -37,7 +37,7 @@ export default async function HomePage() {
       {/* Mobile: stacked layout (image then text below). Desktop: overlay layout */}
       <section id="hero" className="flex flex-col md:min-h-screen md:justify-end md:items-start md:relative md:px-6 lg:px-12 overflow-hidden mb-10 md:pb-48">
         {/* Background Slideshow - mobile: relative container, desktop: absolute fill */}
-        <div className="relative w-full aspect-[2/1] md:aspect-auto md:absolute md:inset-0">
+        <div className="relative w-full aspect-[16/9] md:aspect-auto md:absolute md:inset-0">
           <HeroSection />
         </div>
 
