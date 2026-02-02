@@ -17,7 +17,7 @@ export function CTAButton({ href, children, fullWidth = false, direction = "righ
   return (
     <a
       href={href}
-      className={`group relative ${fullWidth ? 'flex w-full' : 'inline-flex'} items-center justify-center gap-2 overflow-hidden transition-all duration-300 cursor-pointer uppercase text-base font-semibold tracking-tight ${variant === "card" ? '' : 'rounded-full'} shadow-2xl ${variant === "hero" ? '' : 'backdrop-blur-2xl'}`}
+      className={`group relative ${fullWidth ? 'flex w-full' : 'inline-flex'} items-center justify-center gap-2 transition-all duration-300 cursor-pointer uppercase text-base font-semibold tracking-tight ${variant === "card" ? '' : 'rounded-full'} shadow-2xl ${variant === "hero" ? '' : 'backdrop-blur-2xl'}`}
       style={{
         '--main-color': 'rgb(52, 118, 234)',
         '--main-bg-color': 'rgba(52, 118, 234, 0.36)',
