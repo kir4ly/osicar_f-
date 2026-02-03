@@ -55,6 +55,7 @@ export default function AdminPage() {
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const [newImageUrl, setNewImageUrl] = useState("");
   const [uploadingImage, setUploadingImage] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState("");
 
   useEffect(() => {
     const savedAuth = sessionStorage.getItem("adminAuth");
@@ -259,8 +260,8 @@ export default function AdminPage() {
     setImageUrls(imageUrls.filter((_, i) => i !== index));
   }
 
-  // Kép optimalizálás - átméretezés és tömörítés
-  async function optimizeImage(file: File, maxWidth = 1920, quality = 0.8): Promise<Blob> {
+  // Kép optimalizálás - átméretezés és tömörítés (mobil-barát)
+  async function optimizeImage(file: File, maxWidth = 1600, quality = 0.75): Promise<Blob> {
     // createImageBitmap jól kezeli az EXIF orientációt és a legtöbb formátumot (HEIC is iOS-en)
     if (typeof createImageBitmap !== 'undefined') {
       try {
@@ -268,9 +269,12 @@ export default function AdminPage() {
         const canvas = document.createElement('canvas');
         let { width, height } = bitmap;
 
-        if (width > maxWidth) {
-          height = (height * maxWidth) / width;
-          width = maxWidth;
+        // Max méret korlátozás (mobil memória miatt)
+        const maxDimension = Math.max(width, height);
+        if (maxDimension > maxWidth) {
+          const scale = maxWidth / maxDimension;
+          width = Math.round(width * scale);
+          height = Math.round(height * scale);
         }
 
         canvas.width = width;
@@ -279,6 +283,9 @@ export default function AdminPage() {
         const ctx = canvas.getContext('2d');
         if (!ctx) throw new Error('Canvas context not available');
 
+        // Fehér háttér (átlátszóság helyett)
+        ctx.fillStyle = '#000000';
+        ctx.fillRect(0, 0, width, height);
         ctx.drawImage(bitmap, 0, 0, width, height);
         bitmap.close();
 
@@ -289,7 +296,8 @@ export default function AdminPage() {
             quality
           );
         });
-      } catch {
+      } catch (e) {
+        console.log('createImageBitmap failed, using fallback:', e);
         // Fallback to Image element method
       }
     }
@@ -300,9 +308,11 @@ export default function AdminPage() {
         const canvas = document.createElement('canvas');
         let { width, height } = img;
 
-        if (width > maxWidth) {
-          height = (height * maxWidth) / width;
-          width = maxWidth;
+        const maxDimension = Math.max(width, height);
+        if (maxDimension > maxWidth) {
+          const scale = maxWidth / maxDimension;
+          width = Math.round(width * scale);
+          height = Math.round(height * scale);
         }
 
         canvas.width = width;
@@ -314,6 +324,8 @@ export default function AdminPage() {
           return;
         }
 
+        ctx.fillStyle = '#000000';
+        ctx.fillRect(0, 0, width, height);
         ctx.drawImage(img, 0, 0, width, height);
         URL.revokeObjectURL(img.src);
 
@@ -336,9 +348,13 @@ export default function AdminPage() {
     if (!files || files.length === 0) return;
 
     setUploadingImage(true);
+    const totalFiles = files.length;
+    let uploadedCount = 0;
 
     for (const file of Array.from(files)) {
       try {
+        setUploadProgress(`${uploadedCount + 1}/${totalFiles} feldolgozás...`);
+
         let uploadBlob: Blob;
         let contentType: string;
         let ext: string;
@@ -347,12 +363,20 @@ export default function AdminPage() {
           uploadBlob = await optimizeImage(file);
           contentType = 'image/jpeg';
           ext = 'jpg';
-        } catch {
+        } catch (optimizeError) {
+          console.log('Optimization failed, uploading original:', optimizeError);
           // Ha az optimalizálás nem sikerül (pl. HEIC nem támogatott), feltöltjük az eredetit
           uploadBlob = file;
           contentType = file.type || 'image/jpeg';
           ext = file.name.split('.').pop()?.toLowerCase() || 'jpg';
+          // HEIC fájlok esetén próbáljuk JPEG-ként
+          if (ext === 'heic' || ext === 'heif') {
+            ext = 'jpg';
+            contentType = 'image/jpeg';
+          }
         }
+
+        setUploadProgress(`${uploadedCount + 1}/${totalFiles} feltöltés...`);
 
         const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${ext}`;
         const filePath = `car-images/${fileName}`;
@@ -375,15 +399,23 @@ export default function AdminPage() {
 
         if (publicUrlData?.publicUrl) {
           setImageUrls(prev => [...prev, publicUrlData.publicUrl]);
+          uploadedCount++;
         }
       } catch (err) {
         console.error('Image upload error:', err);
-        alert('Hiba a kép feltöltése során');
+        alert(`Hiba a kép feltöltése során: ${file.name}`);
       }
     }
 
     setUploadingImage(false);
+    setUploadProgress("");
     e.target.value = '';
+
+    if (uploadedCount > 0) {
+      // Kis visszajelzés sikeres feltöltésről
+      setUploadProgress(`${uploadedCount} kép feltöltve!`);
+      setTimeout(() => setUploadProgress(""), 2000);
+    }
   }
 
   if (!isAuthenticated) {
@@ -516,9 +548,9 @@ export default function AdminPage() {
                   </label>
                   <Input
                     type="number"
-                    value={formData.year}
+                    value={formData.year || ""}
                     onChange={(e) =>
-                      setFormData({ ...formData, year: parseInt(e.target.value) })
+                      setFormData({ ...formData, year: e.target.value ? parseInt(e.target.value) : 0 })
                     }
                     min={1990}
                     max={new Date().getFullYear() + 1}
@@ -532,9 +564,9 @@ export default function AdminPage() {
                   </label>
                   <Input
                     type="number"
-                    value={formData.price}
+                    value={formData.price || ""}
                     onChange={(e) =>
-                      setFormData({ ...formData, price: parseInt(e.target.value) })
+                      setFormData({ ...formData, price: e.target.value ? parseInt(e.target.value) : 0 })
                     }
                     min={0}
                     required
@@ -547,9 +579,9 @@ export default function AdminPage() {
                   </label>
                   <Input
                     type="number"
-                    value={formData.mileage}
+                    value={formData.mileage || ""}
                     onChange={(e) =>
-                      setFormData({ ...formData, mileage: parseInt(e.target.value) })
+                      setFormData({ ...formData, mileage: e.target.value ? parseInt(e.target.value) : 0 })
                     }
                     min={0}
                     required
@@ -562,9 +594,9 @@ export default function AdminPage() {
                   </label>
                   <Input
                     type="number"
-                    value={formData.power}
+                    value={formData.power || ""}
                     onChange={(e) =>
-                      setFormData({ ...formData, power: parseInt(e.target.value) })
+                      setFormData({ ...formData, power: e.target.value ? parseInt(e.target.value) : 0 })
                     }
                     min={0}
                     required
@@ -716,20 +748,48 @@ export default function AdminPage() {
                     </button>
                   </div>
 
-                  {/* Fájl feltöltés */}
-                  <label className="relative flex items-center justify-center h-12 md:h-14 border border-dashed border-foreground/20 hover:border-foreground/40 transition-colors cursor-pointer">
+                  {/* Feltöltés progress jelző */}
+                  {uploadProgress && (
+                    <div className="text-center py-2 text-sm text-primary animate-pulse">
+                      {uploadProgress}
+                    </div>
+                  )}
+
+                  {/* Fájl feltöltés - Galéria */}
+                  <label className={`relative flex items-center justify-center h-14 border border-dashed border-foreground/20 hover:border-foreground/40 active:border-primary active:bg-primary/5 transition-colors cursor-pointer touch-manipulation ${uploadingImage ? 'opacity-50 pointer-events-none' : ''}`}>
                     <input
                       type="file"
-                      accept="image/*"
+                      accept="image/*,.heic,.heif"
                       multiple
                       onChange={handleImageUpload}
                       className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                       disabled={uploadingImage}
                     />
                     <div className="flex items-center gap-2 text-muted-foreground">
-                      <Upload className="w-4 h-4 md:w-5 md:h-5" />
-                      <span className="text-xs md:text-sm uppercase tracking-widest">
-                        {uploadingImage ? "Feltöltés..." : "Képek feltöltése"}
+                      <Upload className="w-5 h-5" />
+                      <span className="text-sm uppercase tracking-widest">
+                        {uploadingImage ? "Feltöltés folyamatban..." : "Képek kiválasztása"}
+                      </span>
+                    </div>
+                  </label>
+
+                  {/* Fájl feltöltés - Kamera (mobil) */}
+                  <label className={`relative flex items-center justify-center h-14 border border-dashed border-foreground/20 hover:border-foreground/40 active:border-primary active:bg-primary/5 transition-colors cursor-pointer touch-manipulation md:hidden ${uploadingImage ? 'opacity-50 pointer-events-none' : ''}`}>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      capture="environment"
+                      onChange={handleImageUpload}
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                      disabled={uploadingImage}
+                    />
+                    <div className="flex items-center gap-2 text-muted-foreground">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/>
+                        <circle cx="12" cy="13" r="3"/>
+                      </svg>
+                      <span className="text-sm uppercase tracking-widest">
+                        {uploadingImage ? "Feltöltés..." : "Fénykép készítése"}
                       </span>
                     </div>
                   </label>
