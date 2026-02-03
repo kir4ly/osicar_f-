@@ -48,31 +48,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="hu" className={`${bebasNeue.variable} ${outfit.variable} ${cinzel.variable} bg-black`}>
-      <head>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              document.addEventListener('touchmove', function(e) {
-                if (window.scrollY <= 0) {
-                  var touch = e.touches[0];
-                  if (touch && touch.clientY > window.lastTouchY) {
-                    e.preventDefault();
-                  }
-                }
-                window.lastTouchY = e.touches[0] ? e.touches[0].clientY : 0;
-              }, { passive: false });
-              document.addEventListener('touchstart', function(e) {
-                window.lastTouchY = e.touches[0] ? e.touches[0].clientY : 0;
-              }, { passive: true });
-            `,
-          }}
-        />
-      </head>
-      <body className="min-h-screen flex flex-col antialiased bg-black">
-        <Header />
-        <main className="flex-1">{children}</main>
-        <Footer />
+    <html lang="hu" className={`${bebasNeue.variable} ${outfit.variable} ${cinzel.variable}`}>
+      <body className="fixed inset-0 overflow-hidden bg-black">
+        <div className="h-full overflow-y-auto overflow-x-hidden overscroll-none">
+          <div className="min-h-screen flex flex-col">
+            <Header />
+            <main className="flex-1">{children}</main>
+            <Footer />
+          </div>
+        </div>
       </body>
     </html>
   );
