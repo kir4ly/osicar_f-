@@ -29,12 +29,11 @@ export const metadata: Metadata = {
     initialScale: 1,
     maximumScale: 5,
     userScalable: true,
-    viewportFit: "cover",
   },
-  themeColor: "#0a0a0a",
+  themeColor: "#000000",
   appleWebApp: {
     capable: true,
-    statusBarStyle: "black-translucent",
+    statusBarStyle: "black",
     title: "OSICAR",
   },
   formatDetection: {
