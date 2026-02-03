@@ -57,12 +57,32 @@ export default async function CarDetailPage({
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 lg:gap-20">
           {/* Left column - Image */}
           <div className="animate-fade-up delay-100">
-            <div className="aspect-[4/3] bg-black overflow-hidden">
+            <div className="aspect-[4/3] bg-black overflow-hidden relative group">
               <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-foreground/5 to-foreground/10">
                 <span className="text-display-xl text-foreground/10">
                   {car.brand}
                 </span>
               </div>
+
+              {/* Navigációs nyilak a képen */}
+              {prevCar && (
+                <Link
+                  href={`/autok/${prevCar.id}`}
+                  className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 w-10 h-10 md:w-12 md:h-12 bg-black/60 hover:bg-black/80 backdrop-blur-sm flex items-center justify-center transition-all opacity-70 md:opacity-0 md:group-hover:opacity-100 z-10 rounded-full"
+                  aria-label={`Előző: ${prevCar.brand} ${prevCar.model}`}
+                >
+                  <ChevronLeft className="w-5 h-5 md:w-6 md:h-6 text-white" />
+                </Link>
+              )}
+              {nextCar && (
+                <Link
+                  href={`/autok/${nextCar.id}`}
+                  className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 w-10 h-10 md:w-12 md:h-12 bg-black/60 hover:bg-black/80 backdrop-blur-sm flex items-center justify-center transition-all opacity-70 md:opacity-0 md:group-hover:opacity-100 z-10 rounded-full"
+                  aria-label={`Következő: ${nextCar.brand} ${nextCar.model}`}
+                >
+                  <ChevronRight className="w-5 h-5 md:w-6 md:h-6 text-white" />
+                </Link>
+              )}
             </div>
           </div>
 
