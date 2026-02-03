@@ -35,7 +35,7 @@ export function Header() {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 w-full z-50 bg-black" style={{ WebkitBackfaceVisibility: 'hidden' }}>
+    <header className="fixed top-0 left-0 right-0 w-full z-50 bg-black pt-[env(safe-area-inset-top)]" style={{ WebkitBackfaceVisibility: 'hidden', paddingTop: 'env(safe-area-inset-top)' }}>
       <div className="container mx-auto flex h-16 md:h-20 items-center px-4 md:px-6 lg:px-12">
         {/* Logo - középen a header széle és a nav között */}
         <div className="flex-1 flex justify-start">
