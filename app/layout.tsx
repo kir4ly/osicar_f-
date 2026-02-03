@@ -48,8 +48,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="hu" className={`${bebasNeue.variable} ${outfit.variable} ${cinzel.variable}`}>
-      <body className="min-h-screen flex flex-col antialiased">
+    <html lang="hu" className={`${bebasNeue.variable} ${outfit.variable} ${cinzel.variable} bg-black`}>
+      <body className="min-h-screen flex flex-col antialiased bg-black">
         <Header />
         <main className="flex-1">{children}</main>
         <Footer />
