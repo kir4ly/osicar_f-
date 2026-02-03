@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { cars } from "@/lib/data";
 import { CTAButton } from "@/components/cta-button";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 function formatPrice(price: number): string {
   return new Intl.NumberFormat("hu-HU").format(price);
@@ -23,11 +24,16 @@ export default async function CarDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const car = cars.find((c) => c.id === id);
+  const carIndex = cars.findIndex((c) => c.id === id);
+  const car = cars[carIndex];
 
   if (!car) {
     notFound();
   }
+
+  // Navigációhoz: előző és következő autó
+  const prevCar = carIndex > 0 ? cars[carIndex - 1] : null;
+  const nextCar = carIndex < cars.length - 1 ? cars[carIndex + 1] : null;
 
   const specs = [
     { label: "Évjárat", value: car.year.toString() },
@@ -130,6 +136,45 @@ export default async function CarDetailPage({
                 Hívj most
               </CTAButton>
             </div>
+          </div>
+        </div>
+
+        {/* Navigáció autók között */}
+        <div className="mt-12 md:mt-20 pt-8 md:pt-12 border-t border-foreground/10 animate-fade-up delay-900">
+          <div className="flex items-center justify-between">
+            {prevCar ? (
+              <Link
+                href={`/autok/${prevCar.id}`}
+                className="group flex items-center gap-3 md:gap-4 hover:text-primary transition-colors"
+              >
+                <div className="w-10 h-10 md:w-12 md:h-12 border border-foreground/20 group-hover:border-primary/50 flex items-center justify-center transition-colors rounded-full">
+                  <ChevronLeft className="w-5 h-5 md:w-6 md:h-6" />
+                </div>
+                <div className="text-left">
+                  <p className="text-[10px] md:text-xs uppercase tracking-widest text-muted-foreground mb-0.5 md:mb-1">Előző</p>
+                  <p className="text-sm md:text-base font-display uppercase">{prevCar.brand} {prevCar.model}</p>
+                </div>
+              </Link>
+            ) : (
+              <div />
+            )}
+
+            {nextCar ? (
+              <Link
+                href={`/autok/${nextCar.id}`}
+                className="group flex items-center gap-3 md:gap-4 hover:text-primary transition-colors"
+              >
+                <div className="text-right">
+                  <p className="text-[10px] md:text-xs uppercase tracking-widest text-muted-foreground mb-0.5 md:mb-1">Következő</p>
+                  <p className="text-sm md:text-base font-display uppercase">{nextCar.brand} {nextCar.model}</p>
+                </div>
+                <div className="w-10 h-10 md:w-12 md:h-12 border border-foreground/20 group-hover:border-primary/50 flex items-center justify-center transition-colors rounded-full">
+                  <ChevronRight className="w-5 h-5 md:w-6 md:h-6" />
+                </div>
+              </Link>
+            ) : (
+              <div />
+            )}
           </div>
         </div>
 
