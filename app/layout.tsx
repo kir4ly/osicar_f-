@@ -49,16 +49,27 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="hu" className={`${bebasNeue.variable} ${outfit.variable} ${cinzel.variable} bg-black`}>
-      <body className="min-h-screen flex flex-col antialiased bg-black">
-        {/* iOS overscroll fekete háttér - Dynamic Island felett */}
-        <div
-          className="fixed left-0 right-0 bg-black z-[60] pointer-events-none"
-          style={{
-            top: 'calc(-100vh - env(safe-area-inset-top))',
-            height: 'calc(100vh + env(safe-area-inset-top))',
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              document.addEventListener('touchmove', function(e) {
+                if (window.scrollY <= 0) {
+                  var touch = e.touches[0];
+                  if (touch && touch.clientY > window.lastTouchY) {
+                    e.preventDefault();
+                  }
+                }
+                window.lastTouchY = e.touches[0] ? e.touches[0].clientY : 0;
+              }, { passive: false });
+              document.addEventListener('touchstart', function(e) {
+                window.lastTouchY = e.touches[0] ? e.touches[0].clientY : 0;
+              }, { passive: true });
+            `,
           }}
-          aria-hidden="true"
         />
+      </head>
+      <body className="min-h-screen flex flex-col antialiased bg-black">
         <Header />
         <main className="flex-1">{children}</main>
         <Footer />
