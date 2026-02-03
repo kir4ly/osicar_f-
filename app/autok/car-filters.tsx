@@ -14,6 +14,90 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { CTAButton } from "@/components/cta-button";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+
+// Kép carousel komponens a kártyákhoz
+function CarImageCarousel({
+  images,
+  brand,
+  model,
+  carId,
+  isFromSupabase,
+  priority = false,
+  grayscale = false
+}: {
+  images?: string[];
+  brand: string;
+  model: string;
+  carId: string;
+  isFromSupabase?: boolean;
+  priority?: boolean;
+  grayscale?: boolean;
+}) {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const validImages = images?.filter(img => img && !img.includes("placeholder")) || [];
+  const hasMultipleImages = validImages.length > 1;
+
+  const goToPrevious = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setCurrentIndex((prev) => (prev === 0 ? validImages.length - 1 : prev - 1));
+  };
+
+  const goToNext = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setCurrentIndex((prev) => (prev === validImages.length - 1 ? 0 : prev + 1));
+  };
+
+  return (
+    <div className="aspect-[16/10] bg-black overflow-hidden relative rounded-t-xl group/carousel">
+      <Link href={isFromSupabase ? `/autok/db/${carId}` : `/autok/${carId}`}>
+        {validImages.length > 0 ? (
+          <Image
+            src={validImages[currentIndex]}
+            alt={`${brand} ${model}`}
+            fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            className={`object-contain transition-transform duration-700 ${grayscale ? 'grayscale' : ''}`}
+            loading={priority ? "eager" : "lazy"}
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-foreground/5 to-foreground/10">
+            <span className="text-lg md:text-display-md text-foreground/10 font-display uppercase">
+              {brand}
+            </span>
+          </div>
+        )}
+      </Link>
+
+      {/* Navigációs nyilak - csak ha több kép van */}
+      {hasMultipleImages && (
+        <>
+          <button
+            onClick={goToPrevious}
+            className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 md:w-10 md:h-10 bg-black/60 hover:bg-black/80 backdrop-blur-sm flex items-center justify-center transition-all opacity-70 md:opacity-0 md:group-hover/carousel:opacity-100 z-10 rounded-full"
+            aria-label="Előző kép"
+          >
+            <ChevronLeft className="w-5 h-5 md:w-6 md:h-6 text-white" />
+          </button>
+          <button
+            onClick={goToNext}
+            className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 md:w-10 md:h-10 bg-black/60 hover:bg-black/80 backdrop-blur-sm flex items-center justify-center transition-all opacity-70 md:opacity-0 md:group-hover/carousel:opacity-100 z-10 rounded-full"
+            aria-label="Következő kép"
+          >
+            <ChevronRight className="w-5 h-5 md:w-6 md:h-6 text-white" />
+          </button>
+
+          {/* Képszámláló */}
+          <div className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-black/60 backdrop-blur-sm px-2 py-1 rounded-full text-xs text-white/80 z-10">
+            {currentIndex + 1} / {validImages.length}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
 
 function formatPrice(price: number): string {
   return new Intl.NumberFormat("hu-HU").format(price);
@@ -256,27 +340,15 @@ export function CarFilters({ supabaseCars, staticCars }: CarFiltersProps) {
                 boxShadow: '0 0 10px rgba(52, 118, 234, 0.15), 0 0 20px rgba(52, 118, 234, 0.08)'
               }}
             >
-              {/* Kép - széltől-szélig mobilon */}
-              <Link href={car.isFromSupabase ? `/autok/db/${car.id}` : `/autok/${car.id}`}>
-                <div className="aspect-[16/10] bg-black overflow-hidden relative rounded-t-xl md:rounded-t-xl">
-                  {car.images && car.images.length > 0 && car.images[0] && !car.images[0].includes("placeholder") ? (
-                    <Image
-                      src={car.images[0]}
-                      alt={`${car.brand} ${car.model}`}
-                      fill
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                      className="object-contain group-hover:scale-105 transition-transform duration-700"
-                      loading={index < 6 ? "eager" : "lazy"}
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-foreground/5 to-foreground/10 group-hover:scale-105 transition-transform duration-700">
-                      <span className="text-lg md:text-display-md text-foreground/10 font-display uppercase">
-                        {car.brand}
-                      </span>
-                    </div>
-                  )}
-                </div>
-              </Link>
+              {/* Kép carousel - széltől-szélig mobilon */}
+              <CarImageCarousel
+                images={car.images}
+                brand={car.brand}
+                model={car.model}
+                carId={car.id}
+                isFromSupabase={car.isFromSupabase}
+                priority={index < 6}
+              />
 
               {/* Tartalom */}
               <div className="p-4 md:p-6 pt-4 md:pt-6 flex flex-col flex-1">
@@ -364,34 +436,24 @@ export function CarFilters({ supabaseCars, staticCars }: CarFiltersProps) {
                 style={{ animationDelay: `${(index % 6) * 50}ms` }}
               >
                 {/* Kép évjárat és eladva badge-dzsel */}
-                <Link href={car.isFromSupabase ? `/autok/db/${car.id}` : `/autok/${car.id}`}>
-                  <div className="aspect-[16/10] bg-black overflow-hidden relative">
-                    {car.images && car.images.length > 0 && car.images[0] && !car.images[0].includes("placeholder") ? (
-                      <Image
-                        src={car.images[0]}
-                        alt={`${car.brand} ${car.model}`}
-                        fill
-                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                        className="object-contain group-hover:scale-105 transition-transform duration-700 grayscale"
-                        loading="lazy"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-foreground/5 to-foreground/10 group-hover:scale-105 transition-transform duration-700">
-                        <span className="text-lg md:text-display-md text-foreground/10 font-display uppercase">
-                          {car.brand}
-                        </span>
-                      </div>
-                    )}
-                    {/* Évjárat badge */}
-                    <div className="absolute top-4 left-4 bg-black/80 backdrop-blur-sm text-white text-sm font-medium px-4 py-2 rounded">
-                      {car.year}
-                    </div>
-                    {/* Eladva badge */}
-                    <div className="absolute top-4 right-4 bg-green-600 text-white text-xs font-bold px-4 py-2 uppercase tracking-wider rounded">
-                      Eladva
-                    </div>
+                <div className="relative">
+                  <CarImageCarousel
+                    images={car.images}
+                    brand={car.brand}
+                    model={car.model}
+                    carId={car.id}
+                    isFromSupabase={car.isFromSupabase}
+                    grayscale
+                  />
+                  {/* Évjárat badge */}
+                  <div className="absolute top-4 left-4 bg-black/80 backdrop-blur-sm text-white text-sm font-medium px-4 py-2 rounded z-20">
+                    {car.year}
                   </div>
-                </Link>
+                  {/* Eladva badge */}
+                  <div className="absolute top-4 right-4 bg-green-600 text-white text-xs font-bold px-4 py-2 uppercase tracking-wider rounded z-20">
+                    Eladva
+                  </div>
+                </div>
 
                 {/* Tartalom */}
                 <div className="p-6 pt-6">
@@ -455,34 +517,24 @@ export function CarFilters({ supabaseCars, staticCars }: CarFiltersProps) {
                 style={{ animationDelay: `${(index % 6) * 50}ms` }}
               >
                 {/* Kép évjárat és teljesítve badge-dzsel */}
-                <Link href={car.isFromSupabase ? `/autok/db/${car.id}` : `/autok/${car.id}`}>
-                  <div className="aspect-[16/10] bg-black overflow-hidden relative">
-                    {car.images && car.images.length > 0 && car.images[0] && !car.images[0].includes("placeholder") ? (
-                      <Image
-                        src={car.images[0]}
-                        alt={`${car.brand} ${car.model}`}
-                        fill
-                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                        className="object-contain group-hover:scale-105 transition-transform duration-700 grayscale"
-                        loading="lazy"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-foreground/5 to-foreground/10 group-hover:scale-105 transition-transform duration-700">
-                        <span className="text-lg md:text-display-md text-foreground/10 font-display uppercase">
-                          {car.brand}
-                        </span>
-                      </div>
-                    )}
-                    {/* Évjárat badge */}
-                    <div className="absolute top-4 left-4 bg-black/80 backdrop-blur-sm text-white text-sm font-medium px-4 py-2 rounded">
-                      {car.year}
-                    </div>
-                    {/* Teljesítve badge */}
-                    <div className="absolute top-4 right-4 bg-blue-600 text-white text-xs font-bold px-4 py-2 uppercase tracking-wider rounded">
-                      Teljesítve
-                    </div>
+                <div className="relative">
+                  <CarImageCarousel
+                    images={car.images}
+                    brand={car.brand}
+                    model={car.model}
+                    carId={car.id}
+                    isFromSupabase={car.isFromSupabase}
+                    grayscale
+                  />
+                  {/* Évjárat badge */}
+                  <div className="absolute top-4 left-4 bg-black/80 backdrop-blur-sm text-white text-sm font-medium px-4 py-2 rounded z-20">
+                    {car.year}
                   </div>
-                </Link>
+                  {/* Teljesítve badge */}
+                  <div className="absolute top-4 right-4 bg-blue-600 text-white text-xs font-bold px-4 py-2 uppercase tracking-wider rounded z-20">
+                    Teljesítve
+                  </div>
+                </div>
 
                 {/* Tartalom */}
                 <div className="p-6 pt-6">
