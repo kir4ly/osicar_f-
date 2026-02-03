@@ -374,23 +374,6 @@ body {
   body {
     -webkit-overflow-scrolling: touch;
   }
-
-  /* iOS overscroll background fix */
-  html {
-    background-color: #000 !important;
-  }
-
-  body::before {
-    content: '';
-    position: fixed;
-    top: -100vh;
-    left: 0;
-    right: 0;
-    height: 100vh;
-    background-color: #000;
-    z-index: 9998;
-    pointer-events: none;
-  }
 }
 
 /* Safe area padding for notched devices (iPhone X+, etc.) */

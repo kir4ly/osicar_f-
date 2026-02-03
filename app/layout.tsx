@@ -3,6 +3,7 @@ import { Bebas_Neue, Outfit, Cinzel } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
+import { IOSOverscrollFix } from "@/components/ios-overscroll-fix";
 
 const bebasNeue = Bebas_Neue({
   weight: "400",
@@ -48,15 +49,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="hu" className={`${bebasNeue.variable} ${outfit.variable} ${cinzel.variable}`}>
-      <body className="fixed inset-0 overflow-hidden bg-black">
-        <div className="h-full overflow-y-auto overflow-x-hidden overscroll-none">
-          <div className="min-h-screen flex flex-col">
-            <Header />
-            <main className="flex-1">{children}</main>
-            <Footer />
-          </div>
-        </div>
+    <html lang="hu" className={`${bebasNeue.variable} ${outfit.variable} ${cinzel.variable}`} style={{ backgroundColor: '#000' }}>
+      <body className="min-h-screen flex flex-col antialiased" style={{ backgroundColor: '#000' }}>
+        <IOSOverscrollFix />
+        <Header />
+        <main className="flex-1">{children}</main>
+        <Footer />
       </body>
     </html>
   );
