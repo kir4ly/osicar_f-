@@ -95,7 +95,7 @@ export default async function CarDetailPage({
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 lg:gap-20">
           {/* Left column - Image */}
           <div className="animate-fade-up delay-100">
-            <div className="aspect-[4/3] bg-muted/30 overflow-hidden relative">
+            <div className="aspect-[4/3] bg-black overflow-hidden relative">
               {car.images && car.images.length > 0 && car.images[0] ? (
                 <Image
                   src={car.images[0]}
@@ -103,7 +103,7 @@ export default async function CarDetailPage({
                   fill
                   sizes="(max-width: 1024px) 100vw, 50vw"
                   priority
-                  className="object-cover"
+                  className="object-contain"
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-foreground/5 to-foreground/10">
@@ -117,14 +117,14 @@ export default async function CarDetailPage({
             {car.images && car.images.length > 1 && (
               <div className="grid grid-cols-4 gap-1 md:gap-2 mt-1 md:mt-2">
                 {car.images.slice(1, 5).map((img, index) => (
-                  <div key={index} className="aspect-[4/3] bg-muted/30 overflow-hidden relative">
+                  <div key={index} className="aspect-[4/3] bg-black overflow-hidden relative">
                     <Image
                       src={img}
                       alt={`${car.brand} ${car.model} - ${index + 2}`}
                       fill
                       sizes="(max-width: 1024px) 25vw, 12.5vw"
                       loading="lazy"
-                      className="object-cover"
+                      className="object-contain"
                     />
                   </div>
                 ))}

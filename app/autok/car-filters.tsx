@@ -256,16 +256,16 @@ export function CarFilters({ supabaseCars, staticCars }: CarFiltersProps) {
                 boxShadow: '0 0 10px rgba(52, 118, 234, 0.15), 0 0 20px rgba(52, 118, 234, 0.08)'
               }}
             >
-              {/* Kép évjárat badge-dzsel */}
+              {/* Kép - széltől-szélig mobilon */}
               <Link href={car.isFromSupabase ? `/autok/db/${car.id}` : `/autok/${car.id}`}>
-                <div className="aspect-[16/10] bg-muted/30 overflow-hidden relative m-3 md:m-5 mb-0">
+                <div className="aspect-[16/10] bg-black overflow-hidden relative rounded-t-xl md:rounded-t-xl">
                   {car.images && car.images.length > 0 && car.images[0] && !car.images[0].includes("placeholder") ? (
                     <Image
                       src={car.images[0]}
                       alt={`${car.brand} ${car.model}`}
                       fill
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                      className="object-cover group-hover:scale-105 transition-transform duration-700"
+                      className="object-contain group-hover:scale-105 transition-transform duration-700"
                       loading={index < 6 ? "eager" : "lazy"}
                     />
                   ) : (
@@ -365,14 +365,14 @@ export function CarFilters({ supabaseCars, staticCars }: CarFiltersProps) {
               >
                 {/* Kép évjárat és eladva badge-dzsel */}
                 <Link href={car.isFromSupabase ? `/autok/db/${car.id}` : `/autok/${car.id}`}>
-                  <div className="aspect-[16/10] bg-muted/30 overflow-hidden relative m-5 mb-0">
+                  <div className="aspect-[16/10] bg-black overflow-hidden relative">
                     {car.images && car.images.length > 0 && car.images[0] && !car.images[0].includes("placeholder") ? (
                       <Image
                         src={car.images[0]}
                         alt={`${car.brand} ${car.model}`}
                         fill
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                        className="object-cover group-hover:scale-105 transition-transform duration-700 grayscale"
+                        className="object-contain group-hover:scale-105 transition-transform duration-700 grayscale"
                         loading="lazy"
                       />
                     ) : (
@@ -456,14 +456,14 @@ export function CarFilters({ supabaseCars, staticCars }: CarFiltersProps) {
               >
                 {/* Kép évjárat és teljesítve badge-dzsel */}
                 <Link href={car.isFromSupabase ? `/autok/db/${car.id}` : `/autok/${car.id}`}>
-                  <div className="aspect-[16/10] bg-muted/30 overflow-hidden relative m-5 mb-0">
+                  <div className="aspect-[16/10] bg-black overflow-hidden relative">
                     {car.images && car.images.length > 0 && car.images[0] && !car.images[0].includes("placeholder") ? (
                       <Image
                         src={car.images[0]}
                         alt={`${car.brand} ${car.model}`}
                         fill
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                        className="object-cover group-hover:scale-105 transition-transform duration-700 grayscale"
+                        className="object-contain group-hover:scale-105 transition-transform duration-700 grayscale"
                         loading="lazy"
                       />
                     ) : (

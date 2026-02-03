@@ -51,7 +51,7 @@ export default async function CarDetailPage({
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 lg:gap-20">
           {/* Left column - Image */}
           <div className="animate-fade-up delay-100">
-            <div className="aspect-[4/3] bg-muted/30 overflow-hidden">
+            <div className="aspect-[4/3] bg-black overflow-hidden">
               <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-foreground/5 to-foreground/10">
                 <span className="text-display-xl text-foreground/10">
                   {car.brand}

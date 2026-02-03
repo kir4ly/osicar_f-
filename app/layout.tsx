@@ -21,9 +21,25 @@ const cinzel = Cinzel({
 });
 
 export const metadata: Metadata = {
-  title: "AutoPiac - Megbízható Használt Autók",
+  title: "OSICAR - Megbízható Használt Autók",
   description:
-    "Prémium használt autók széles kínálata Budapesten. BMW, Mercedes, Audi és más márkák. Átlátható ügyintézés, garanciával.",
+    "Prémium használt autók széles kínálata. BMW, Mercedes, Audi és más márkák. Átlátható ügyintézés, garanciával.",
+  viewport: {
+    width: "device-width",
+    initialScale: 1,
+    maximumScale: 5,
+    userScalable: true,
+    viewportFit: "cover",
+  },
+  themeColor: "#0a0a0a",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "OSICAR",
+  },
+  formatDetection: {
+    telephone: true,
+  },
 };
 
 export default function RootLayout({
