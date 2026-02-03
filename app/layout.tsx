@@ -50,8 +50,15 @@ export default function RootLayout({
   return (
     <html lang="hu" className={`${bebasNeue.variable} ${outfit.variable} ${cinzel.variable} bg-black`}>
       <body className="min-h-screen flex flex-col antialiased bg-black">
-        {/* iOS overscroll fekete háttér */}
-        <div className="fixed top-[-100vh] left-0 right-0 h-[100vh] bg-black z-[60] pointer-events-none" aria-hidden="true" />
+        {/* iOS overscroll fekete háttér - Dynamic Island felett */}
+        <div
+          className="fixed left-0 right-0 bg-black z-[60] pointer-events-none"
+          style={{
+            top: 'calc(-100vh - env(safe-area-inset-top))',
+            height: 'calc(100vh + env(safe-area-inset-top))',
+          }}
+          aria-hidden="true"
+        />
         <Header />
         <main className="flex-1">{children}</main>
         <Footer />
