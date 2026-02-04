@@ -1,10 +1,10 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import Image from "next/image";
 import { createClient } from "@supabase/supabase-js";
 import { CarData } from "@/lib/supabase";
 import { Metadata } from "next";
 import { CTAButton } from "@/components/cta-button";
+import { CarImageGallery } from "@/components/car-image-gallery";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 // Revalidate every hour
@@ -113,63 +113,13 @@ export default async function CarDetailPage({
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 lg:gap-20">
-          {/* Left column - Image */}
+          {/* Left column - Image Gallery */}
           <div className="animate-fade-up delay-100">
-            <div className="aspect-[4/3] bg-black overflow-hidden relative group">
-              {car.images && car.images.length > 0 && car.images[0] ? (
-                <Image
-                  src={car.images[0]}
-                  alt={`${car.brand} ${car.model}`}
-                  fill
-                  sizes="(max-width: 1024px) 100vw, 50vw"
-                  priority
-                  className="object-contain"
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-foreground/5 to-foreground/10">
-                  <span className="text-display-lg md:text-display-xl text-foreground/10">
-                    {car.brand}
-                  </span>
-                </div>
-              )}
-
-              {/* Navigációs nyilak a képen */}
-              {prevCar && (
-                <Link
-                  href={`/autok/db/${prevCar.id}`}
-                  className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 w-10 h-10 md:w-12 md:h-12 bg-black/60 hover:bg-black/80 backdrop-blur-sm flex items-center justify-center transition-all opacity-70 md:opacity-0 md:group-hover:opacity-100 z-10 rounded-full"
-                  aria-label={`Előző: ${prevCar.brand} ${prevCar.model}`}
-                >
-                  <ChevronLeft className="w-5 h-5 md:w-6 md:h-6 text-white" />
-                </Link>
-              )}
-              {nextCar && (
-                <Link
-                  href={`/autok/db/${nextCar.id}`}
-                  className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 w-10 h-10 md:w-12 md:h-12 bg-black/60 hover:bg-black/80 backdrop-blur-sm flex items-center justify-center transition-all opacity-70 md:opacity-0 md:group-hover:opacity-100 z-10 rounded-full"
-                  aria-label={`Következő: ${nextCar.brand} ${nextCar.model}`}
-                >
-                  <ChevronRight className="w-5 h-5 md:w-6 md:h-6 text-white" />
-                </Link>
-              )}
-            </div>
-            {/* Additional images */}
-            {car.images && car.images.length > 1 && (
-              <div className="grid grid-cols-4 gap-1 md:gap-2 mt-1 md:mt-2">
-                {car.images.slice(1, 5).map((img, index) => (
-                  <div key={index} className="aspect-[4/3] bg-black overflow-hidden relative">
-                    <Image
-                      src={img}
-                      alt={`${car.brand} ${car.model} - ${index + 2}`}
-                      fill
-                      sizes="(max-width: 1024px) 25vw, 12.5vw"
-                      loading="lazy"
-                      className="object-contain"
-                    />
-                  </div>
-                ))}
-              </div>
-            )}
+            <CarImageGallery
+              images={car.images || []}
+              brand={car.brand}
+              model={car.model}
+            />
           </div>
 
           {/* Right column - Details */}

@@ -1,6 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Allow dev access from local network (mobile testing)
+  allowedDevOrigins: ["192.168.1.154"],
+
   // Image optimization
   images: {
     formats: ["image/avif", "image/webp"],
