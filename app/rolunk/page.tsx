@@ -114,10 +114,10 @@ export default function AboutPage() {
                   Cím
                 </p>
                 <p className="text-display-md md:text-display-lg text-primary">
-                  Rákóczi Ferenc utca 73 A
+                  9600 Sárvár
                 </p>
                 <p className="text-display-md md:text-display-lg text-primary">
-                  9600 Sárvár
+                  Rákóczi Ferenc utca 73 A
                 </p>
                 <p className="text-display-md md:text-display-lg text-primary">
                   Magyarország
