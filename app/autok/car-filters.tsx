@@ -3,7 +3,7 @@
 import { useState, useMemo } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { brands, fuels, transmissions, Car } from "@/lib/data";
+import { fuels, transmissions } from "@/lib/data";
 import { CarData } from "@/lib/supabase";
 import { Input } from "@/components/ui/input";
 import {
@@ -107,14 +107,13 @@ function formatMileage(mileage: number): string {
   return new Intl.NumberFormat("hu-HU").format(mileage);
 }
 
-type CombinedCar = (Car | CarData) & { isFromSupabase?: boolean; sold?: boolean; fulfilled?: boolean };
+type CombinedCar = CarData & { isFromSupabase: boolean };
 
 interface CarFiltersProps {
   supabaseCars: CarData[];
-  staticCars: Car[];
 }
 
-export function CarFilters({ supabaseCars, staticCars }: CarFiltersProps) {
+export function CarFilters({ supabaseCars }: CarFiltersProps) {
   const [search, setSearch] = useState("");
   const [brand, setBrand] = useState<string>("all");
   const [fuel, setFuel] = useState<string>("all");
@@ -124,23 +123,21 @@ export function CarFilters({ supabaseCars, staticCars }: CarFiltersProps) {
 
   // Szétválasztjuk az eladott, teljesített és elérhető autókat
   const { availableCars, soldCars, fulfilledCars } = useMemo(() => {
-    const supabaseWithFlag = supabaseCars.map((car) => ({
+    const all = supabaseCars.map((car) => ({
       ...car,
-      isFromSupabase: true,
+      isFromSupabase: true as const,
     }));
-    const all = [...supabaseWithFlag, ...staticCars];
     return {
       availableCars: all.filter((car) => !car.sold && !car.fulfilled),
       soldCars: all.filter((car) => car.sold),
       fulfilledCars: all.filter((car) => car.fulfilled),
     };
-  }, [supabaseCars, staticCars]);
+  }, [supabaseCars]);
 
   const allCars: CombinedCar[] = availableCars;
 
   const allBrands = useMemo(() => {
-    const supabaseBrands = supabaseCars.map((car) => car.brand);
-    return [...new Set([...brands, ...supabaseBrands])];
+    return [...new Set(supabaseCars.map((car) => car.brand))];
   }, [supabaseCars]);
 
   const filteredCars = useMemo(() => {

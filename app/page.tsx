@@ -1,5 +1,4 @@
 import { Suspense } from "react";
-import { cars as staticCars } from "@/lib/data";
 import { createClient } from "@supabase/supabase-js";
 import { CarData } from "@/lib/supabase";
 import { CarFilters } from "./autok/car-filters";
@@ -72,7 +71,7 @@ export default async function HomePage() {
           </div>
 
           <Suspense fallback={<CarsLoading />}>
-            <CarFilters supabaseCars={supabaseCars} staticCars={staticCars} />
+            <CarFilters supabaseCars={supabaseCars} />
           </Suspense>
         </div>
       </section>
