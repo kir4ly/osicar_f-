@@ -38,12 +38,7 @@ export default async function HomePage() {
       {/* Hero Section */}
       {/* Mobile: stacked layout (image then text below). Desktop: overlay layout */}
       <section id="hero" className="flex flex-col md:pt-0 md:min-h-screen md:justify-end md:items-start md:relative md:px-6 lg:px-12 mb-10 md:pb-48">
-        {/* Background Slideshow - mobile: relative container, desktop: absolute fill */}
-        <div className="relative w-full aspect-[16/9] md:aspect-auto md:absolute md:inset-0 overflow-hidden">
-          <HeroSection />
-        </div>
-
-        <div className="flex flex-col items-center text-center md:items-start md:text-left w-full max-w-4xl relative z-10 px-6 py-8 md:px-0 md:py-0">
+        <div className="flex flex-col items-center text-center md:items-start md:text-left w-full max-w-4xl relative z-10 px-6 py-8 md:px-0 md:py-0 order-1 md:order-2">
           <h1
             className="font-light uppercase tracking-wider animate-fade-up mb-2 text-white leading-relaxed"
           >
@@ -55,6 +50,11 @@ export default async function HomePage() {
               +36 70 605 0350
             </CTAButton>
           </div>
+        </div>
+
+        {/* Background Slideshow - mobile: relative container, desktop: absolute fill */}
+        <div className="relative w-full aspect-[16/9] md:aspect-auto md:absolute md:inset-0 overflow-hidden order-2 md:order-1">
+          <HeroSection />
         </div>
       </section>
 
