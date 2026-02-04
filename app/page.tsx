@@ -60,7 +60,7 @@ export default async function HomePage() {
         </div>
 
         {/* Gomb - mobilon: 3. (kép alatt) */}
-        <div className="flex justify-center w-full px-6 py-4 order-3 md:hidden animate-fade-up delay-300">
+        <div className="flex justify-center w-full px-6 pt-8 pb-4 order-3 md:hidden animate-fade-up delay-300">
           <CTAButton href="tel:+36706050350" variant="hero">
             +36 70 605 0350
           </CTAButton>
