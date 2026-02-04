@@ -100,7 +100,7 @@ export function Header() {
             <SheetHeader className="sr-only">
               <SheetTitle>Menu</SheetTitle>
             </SheetHeader>
-            <div className="flex flex-col h-full items-center justify-center py-8">
+            <div className="flex flex-col h-full items-center justify-center" style={{ paddingTop: 'calc(2rem + env(safe-area-inset-top, 0px))', paddingBottom: 'calc(2rem + env(safe-area-inset-bottom, 0px))' }}>
               <nav className="flex flex-col items-center gap-6">
                 {navigation.map((item, index) => (
                   <Link
