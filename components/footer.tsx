@@ -21,7 +21,7 @@ export const Footer = memo(function Footer() {
             Kínálat
           </Link>
           <Link
-            href="/rolunk#szolgaltatasok"
+            href="/szolgaltatasok"
             className="text-sm uppercase tracking-widest text-foreground hover:text-primary transition-colors"
           >
             Szolgáltatások
