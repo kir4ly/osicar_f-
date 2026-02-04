@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/select";
 import { Plus, X, Upload, Link as LinkIcon, Check, PackageCheck } from "lucide-react";
 
-const ADMIN_PASSWORD = "osvath123";
+const ADMIN_PASSWORD = "sprinter123";
 
 async function triggerRevalidation() {
   try {
