@@ -1,3 +1,5 @@
+import { Check, ChevronRight } from "lucide-react";
+
 export default function ServicesPage() {
   return (
     <div className="grain-overlay min-h-screen pt-16 md:pt-20">
@@ -9,19 +11,19 @@ export default function ServicesPage() {
               Használt autók - autómentés - autószállítás - teljes körű ügyintézés egy helyen
             </h1>
             <div className="flex items-start gap-3 animate-fade-up delay-100">
-              <span className="text-primary text-lg mt-0.5">&#9654;</span>
+              <ChevronRight className="w-5 h-5 text-primary mt-1 shrink-0" />
               <p className="text-lg md:text-xl text-foreground">
                 Megbízható, ellenőrzött használt autók értékesítésével foglalkozunk, autóink 99%-a külföldről érkezik, dokumentált előélettel.
               </p>
             </div>
             <div className="flex items-start gap-3 mt-4 animate-fade-up delay-200">
-              <span className="text-primary text-lg mt-0.5">&#9654;</span>
+              <ChevronRight className="w-5 h-5 text-primary mt-1 shrink-0" />
               <p className="text-lg md:text-xl text-foreground">
                 Vállaljuk az autók teljes körű papírozását, valamint autómentést és autószállítást belföldön és külföldön.
               </p>
             </div>
             <div className="flex items-start gap-3 mt-4 animate-fade-up delay-300">
-              <span className="text-primary text-lg mt-0.5">&#9654;</span>
+              <ChevronRight className="w-5 h-5 text-primary mt-1 shrink-0" />
               <p className="text-lg md:text-xl text-foreground">
                 Nálunk nem csak autót kapsz – nyugalmat és biztonságot is.
               </p>
@@ -46,31 +48,31 @@ export default function ServicesPage() {
 
             <div className="space-y-4 md:space-y-6">
               <div className="flex items-start gap-3 animate-fade-up delay-300">
-                <span className="text-primary text-lg mt-0.5">✔</span>
+                <Check className="w-5 h-5 text-primary mt-1 shrink-0" />
                 <p className="text-lg md:text-xl">Ellenőrzött előélet</p>
               </div>
               <div className="flex items-start gap-3 animate-fade-up delay-300">
-                <span className="text-primary text-lg mt-0.5">✔</span>
+                <Check className="w-5 h-5 text-primary mt-1 shrink-0" />
                 <p className="text-lg md:text-xl">Külföldről származó, karbantartott járművek</p>
               </div>
               <div className="flex items-start gap-3 animate-fade-up delay-300">
-                <span className="text-primary text-lg mt-0.5">✔</span>
+                <Check className="w-5 h-5 text-primary mt-1 shrink-0" />
                 <p className="text-lg md:text-xl">Valós futásteljesítmény</p>
               </div>
               <div className="flex items-start gap-3 animate-fade-up delay-300">
-                <span className="text-primary text-lg mt-0.5">✔</span>
+                <Check className="w-5 h-5 text-primary mt-1 shrink-0" />
                 <p className="text-lg md:text-xl">Átvizsgált, kipróbált autók</p>
               </div>
               <div className="flex items-start gap-3 animate-fade-up delay-300">
-                <span className="text-primary text-lg mt-0.5">✔</span>
+                <Check className="w-5 h-5 text-primary mt-1 shrink-0" />
                 <p className="text-lg md:text-xl">Rejtett költségek és meglepetések nélkül</p>
               </div>
               <div className="flex items-start gap-3 animate-fade-up delay-300">
-                <span className="text-primary text-lg mt-0.5">✔</span>
+                <Check className="w-5 h-5 text-primary mt-1 shrink-0" />
                 <p className="text-lg md:text-xl">Igény szerint egyedi beszerzés</p>
               </div>
               <div className="flex items-start gap-3 animate-fade-up delay-300">
-                <span className="text-primary text-lg mt-0.5">✔</span>
+                <Check className="w-5 h-5 text-primary mt-1 shrink-0" />
                 <p className="text-lg md:text-xl">Ügyfél számára legjobb ár-érték arányú megoldást segítünk megtalálni</p>
               </div>
             </div>
@@ -98,15 +100,15 @@ export default function ServicesPage() {
 
             <div className="space-y-3 mb-8">
               <div className="flex items-start gap-3 animate-fade-up delay-200">
-                <span className="text-primary text-lg mt-0.5">&#9654;</span>
+                <ChevronRight className="w-5 h-5 text-primary mt-1 shrink-0" />
                 <p className="text-lg md:text-xl text-foreground">szerviz idejére</p>
               </div>
               <div className="flex items-start gap-3 animate-fade-up delay-200">
-                <span className="text-primary text-lg mt-0.5">&#9654;</span>
+                <ChevronRight className="w-5 h-5 text-primary mt-1 shrink-0" />
                 <p className="text-lg md:text-xl text-foreground">külföldi utazáshoz</p>
               </div>
               <div className="flex items-start gap-3 animate-fade-up delay-200">
-                <span className="text-primary text-lg mt-0.5">&#9654;</span>
+                <ChevronRight className="w-5 h-5 text-primary mt-1 shrink-0" />
                 <p className="text-lg md:text-xl text-foreground">átmeneti megoldásként</p>
               </div>
             </div>
@@ -117,23 +119,23 @@ export default function ServicesPage() {
 
             <div className="space-y-4 md:space-y-6">
               <div className="flex items-start gap-3 animate-fade-up delay-300">
-                <span className="text-primary text-lg mt-0.5">✔</span>
+                <Check className="w-5 h-5 text-primary mt-1 shrink-0" />
                 <p className="text-lg md:text-xl">Rövid és hosszú távra</p>
               </div>
               <div className="flex items-start gap-3 animate-fade-up delay-300">
-                <span className="text-primary text-lg mt-0.5">✔</span>
+                <Check className="w-5 h-5 text-primary mt-1 shrink-0" />
                 <p className="text-lg md:text-xl">Megbízható, karbantartott járművek</p>
               </div>
               <div className="flex items-start gap-3 animate-fade-up delay-300">
-                <span className="text-primary text-lg mt-0.5">✔</span>
+                <Check className="w-5 h-5 text-primary mt-1 shrink-0" />
                 <p className="text-lg md:text-xl">Gyors ügyintézés</p>
               </div>
               <div className="flex items-start gap-3 animate-fade-up delay-300">
-                <span className="text-primary text-lg mt-0.5">✔</span>
+                <Check className="w-5 h-5 text-primary mt-1 shrink-0" />
                 <p className="text-lg md:text-xl">Kedvező árak</p>
               </div>
               <div className="flex items-start gap-3 animate-fade-up delay-300">
-                <span className="text-primary text-lg mt-0.5">✔</span>
+                <Check className="w-5 h-5 text-primary mt-1 shrink-0" />
                 <p className="text-lg md:text-xl">Személy- és kisteherautó egyaránt megtalálható</p>
               </div>
             </div>
@@ -160,19 +162,19 @@ export default function ServicesPage() {
 
             <div className="space-y-3 mb-8">
               <div className="flex items-start gap-3 animate-fade-up delay-300">
-                <span className="text-primary text-lg mt-0.5">&#9654;</span>
+                <ChevronRight className="w-5 h-5 text-primary mt-1 shrink-0" />
                 <p className="text-lg md:text-xl">jobb felszereltség</p>
               </div>
               <div className="flex items-start gap-3 animate-fade-up delay-300">
-                <span className="text-primary text-lg mt-0.5">&#9654;</span>
+                <ChevronRight className="w-5 h-5 text-primary mt-1 shrink-0" />
                 <p className="text-lg md:text-xl">rendszeres szervizelés</p>
               </div>
               <div className="flex items-start gap-3 animate-fade-up delay-300">
-                <span className="text-primary text-lg mt-0.5">&#9654;</span>
+                <ChevronRight className="w-5 h-5 text-primary mt-1 shrink-0" />
                 <p className="text-lg md:text-xl">kevesebb kilométer</p>
               </div>
               <div className="flex items-start gap-3 animate-fade-up delay-300">
-                <span className="text-primary text-lg mt-0.5">&#9654;</span>
+                <ChevronRight className="w-5 h-5 text-primary mt-1 shrink-0" />
                 <p className="text-lg md:text-xl">jobb állapot</p>
               </div>
             </div>
@@ -197,27 +199,27 @@ export default function ServicesPage() {
 
             <div className="space-y-4 md:space-y-6">
               <div className="flex items-start gap-3 animate-fade-up delay-200">
-                <span className="text-primary text-lg mt-0.5">✔</span>
+                <Check className="w-5 h-5 text-primary mt-1 shrink-0" />
                 <p className="text-lg md:text-xl">Biztosítás kötés</p>
               </div>
               <div className="flex items-start gap-3 animate-fade-up delay-200">
-                <span className="text-primary text-lg mt-0.5">✔</span>
+                <Check className="w-5 h-5 text-primary mt-1 shrink-0" />
                 <p className="text-lg md:text-xl">Honosítás</p>
               </div>
               <div className="flex items-start gap-3 animate-fade-up delay-200">
-                <span className="text-primary text-lg mt-0.5">✔</span>
+                <Check className="w-5 h-5 text-primary mt-1 shrink-0" />
                 <p className="text-lg md:text-xl">Műszaki vizsga</p>
               </div>
               <div className="flex items-start gap-3 animate-fade-up delay-200">
-                <span className="text-primary text-lg mt-0.5">✔</span>
+                <Check className="w-5 h-5 text-primary mt-1 shrink-0" />
                 <p className="text-lg md:text-xl">Regisztrációs adó</p>
               </div>
               <div className="flex items-start gap-3 animate-fade-up delay-200">
-                <span className="text-primary text-lg mt-0.5">✔</span>
+                <Check className="w-5 h-5 text-primary mt-1 shrink-0" />
                 <p className="text-lg md:text-xl">Okmányirodai ügyintézés</p>
               </div>
               <div className="flex items-start gap-3 animate-fade-up delay-200">
-                <span className="text-primary text-lg mt-0.5">✔</span>
+                <Check className="w-5 h-5 text-primary mt-1 shrink-0" />
                 <p className="text-lg md:text-xl">Forgalomba helyezés</p>
               </div>
             </div>
@@ -242,19 +244,19 @@ export default function ServicesPage() {
 
             <div className="space-y-4 md:space-y-6">
               <div className="flex items-start gap-3 animate-fade-up delay-200">
-                <span className="text-primary text-lg mt-0.5">✔</span>
+                <Check className="w-5 h-5 text-primary mt-1 shrink-0" />
                 <p className="text-lg md:text-xl">Meghibásodott jármű</p>
               </div>
               <div className="flex items-start gap-3 animate-fade-up delay-200">
-                <span className="text-primary text-lg mt-0.5">✔</span>
+                <Check className="w-5 h-5 text-primary mt-1 shrink-0" />
                 <p className="text-lg md:text-xl">Balesetes autó</p>
               </div>
               <div className="flex items-start gap-3 animate-fade-up delay-200">
-                <span className="text-primary text-lg mt-0.5">✔</span>
+                <Check className="w-5 h-5 text-primary mt-1 shrink-0" />
                 <p className="text-lg md:text-xl">Műszaki nélküli jármű</p>
               </div>
               <div className="flex items-start gap-3 animate-fade-up delay-200">
-                <span className="text-primary text-lg mt-0.5">✔</span>
+                <Check className="w-5 h-5 text-primary mt-1 shrink-0" />
                 <p className="text-lg md:text-xl">Külföldről / külföldre szállítás</p>
               </div>
             </div>

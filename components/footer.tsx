@@ -51,11 +51,11 @@ export const Footer = memo(function Footer() {
             <span className="text-sm md:text-base">Facebook</span>
           </a>
           <a
-            href="mailto:osvath0911@gmail.com"
+            href="mailto:info@osicar.hu"
             className="flex items-center gap-3 hover:text-primary transition-colors"
           >
             <Mail className="w-5 h-5 text-primary" />
-            <span className="text-sm md:text-base">osvath0911@gmail.com</span>
+            <span className="text-sm md:text-base">info@osicar.hu</span>
           </a>
           <a
             href="tel:+36706050350"

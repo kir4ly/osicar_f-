@@ -1,3 +1,5 @@
+import { ChevronRight } from "lucide-react";
+
 export default function AboutPage() {
   return (
     <div className="grain-overlay min-h-screen pt-24 md:pt-32">
@@ -16,7 +18,7 @@ export default function AboutPage() {
           <div className="space-y-8 md:space-y-12">
             <div className="animate-fade-up delay-200">
               <div className="flex items-start gap-3 md:gap-4">
-                <span className="text-primary text-2xl md:text-3xl mt-0.5">&#9654;</span>
+                <ChevronRight className="w-7 h-7 md:w-8 md:h-8 text-primary mt-1 shrink-0" />
                 <div>
                   <h3 className="text-display-md md:text-display-lg mb-2 md:mb-3">Használt autók 99%-ban külföldről</h3>
                   <p className="text-primary text-lg md:text-xl">
@@ -28,7 +30,7 @@ export default function AboutPage() {
 
             <div className="animate-fade-up delay-300">
               <div className="flex items-start gap-3 md:gap-4">
-                <span className="text-primary text-2xl md:text-3xl mt-0.5">&#9654;</span>
+                <ChevronRight className="w-7 h-7 md:w-8 md:h-8 text-primary mt-1 shrink-0" />
                 <div>
                   <h3 className="text-display-md md:text-display-lg mb-2 md:mb-3">Autószállítás & Autómentés</h3>
                   <p className="text-primary text-lg md:text-xl">
@@ -40,7 +42,7 @@ export default function AboutPage() {
 
             <div className="animate-fade-up delay-400">
               <div className="flex items-start gap-3 md:gap-4">
-                <span className="text-primary text-2xl md:text-3xl mt-0.5">&#9654;</span>
+                <ChevronRight className="w-7 h-7 md:w-8 md:h-8 text-primary mt-1 shrink-0" />
                 <div>
                   <h3 className="text-display-md md:text-display-lg mb-2 md:mb-3">Bérautók</h3>
                   <p className="text-primary text-lg md:text-xl">
@@ -85,10 +87,10 @@ export default function AboutPage() {
                   Email
                 </p>
                 <a
-                  href="mailto:osvath0911@gmail.com"
+                  href="mailto:info@osicar.hu"
                   className="text-display-md md:text-display-lg line-hover inline-block text-primary break-all"
                 >
-                  osvath0911@gmail.com
+                  info@osicar.hu
                 </a>
               </div>
 
