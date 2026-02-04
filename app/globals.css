@@ -386,6 +386,13 @@ body {
   }
 }
 
+/* Ensure fixed header covers the safe area (Dynamic Island / notch) */
+@supports (padding-top: env(safe-area-inset-top)) {
+  header {
+    padding-top: env(safe-area-inset-top) !important;
+  }
+}
+
 /* Call Button */
 .call-button {
   cursor: pointer;
