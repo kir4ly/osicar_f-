@@ -32,8 +32,8 @@ export default async function HomePage() {
 
   return (
     <div className="grain-overlay">
-      {/* Fekete sáv a Dynamic Island / safe area mögött */}
-      <div className="h-20 md:h-0 bg-black" />
+      {/* Spacer a fixed header + safe area alatt */}
+      <div className="md:h-0" style={{ height: 'calc(4rem + env(safe-area-inset-top, 0px))' }} />
 
       {/* Hero Section */}
       {/* Mobile: stacked layout (image then text below). Desktop: overlay layout */}
