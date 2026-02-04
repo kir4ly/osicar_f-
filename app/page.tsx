@@ -73,6 +73,26 @@ export default async function HomePage() {
           <Suspense fallback={<CarsLoading />}>
             <CarFilters supabaseCars={supabaseCars} />
           </Suspense>
+
+          {/* Google Maps */}
+          <div className="mt-16 md:mt-24 flex justify-center">
+            <div className="relative rounded-2xl overflow-hidden max-w-lg w-full shadow-lg">
+              <iframe
+                src="https://maps.google.com/maps?q=R%C3%A1k%C3%B3czi+Ferenc+utca+73+A,+S%C3%A1rv%C3%A1r,+9600&t=&z=16&ie=UTF8&iwloc=&output=embed&hl=hu"
+                className="w-full aspect-[4/3] border-0 pointer-events-none"
+                allowFullScreen
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                title="OSICAR - 9600 Sárvár, Rákóczi Ferenc utca 73"
+              />
+              <a
+                href="https://maps.app.goo.gl/zjPXxxa1KiY1GcDE8"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="absolute inset-0"
+              />
+            </div>
+          </div>
         </div>
       </section>
     </div>

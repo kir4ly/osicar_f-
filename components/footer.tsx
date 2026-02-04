@@ -35,9 +35,6 @@ export const Footer = memo(function Footer() {
         </nav>
       </div>
 
-      {/* Divider */}
-      <div className="h-px bg-foreground/10" />
-
       <div className="container mx-auto px-4 md:px-6 lg:px-12 py-6 md:py-8">
         {/* Contact info */}
         <div className="flex flex-col items-center gap-4 md:flex-row md:justify-center md:gap-12">
