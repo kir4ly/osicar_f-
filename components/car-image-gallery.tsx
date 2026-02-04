@@ -126,6 +126,7 @@ export function CarImageGallery({ images, brand, model }: CarImageGalleryProps) 
             fill
             sizes="(max-width: 1024px) 100vw, 50vw"
             priority
+            quality={80}
             className="object-contain"
           />
         </button>
@@ -163,7 +164,7 @@ export function CarImageGallery({ images, brand, model }: CarImageGalleryProps) 
       {/* Thumbnail grid */}
       {validImages.length > 1 && (
         <div className="grid grid-cols-4 gap-1 md:gap-2 mt-1 md:mt-2">
-          {validImages.slice(0, 8).map((img, index) => (
+          {validImages.slice(0, 4).map((img, index) => (
             <button
               key={index}
               type="button"

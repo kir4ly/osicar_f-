@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useState, useEffect, useCallback } from "react";
 
 const HERO_COUNT = 12;
-const heroImagesSorted = Array.from({ length: HERO_COUNT }, (_, i) => `/hero/hero-${i + 1}.png`);
+const heroImagesSorted = Array.from({ length: HERO_COUNT }, (_, i) => `/hero/hero-${i + 1}.webp`);
 
 // Fisher-Yates shuffle for random order
 function shuffle<T>(arr: T[]): T[] {
@@ -73,7 +73,7 @@ export function HeroSection() {
           className="object-cover object-center"
           priority
           sizes="100vw"
-          quality={100}
+          quality={80}
         />
 
         <Image
@@ -84,13 +84,8 @@ export function HeroSection() {
             isTransitioning ? "opacity-100" : "opacity-0"
           }`}
           sizes="100vw"
-          quality={100}
-        />
-
-        <link
-          rel="preload"
-          as="image"
-          href={heroImages[(currentIndex + 2) % heroImages.length]}
+          quality={80}
+          loading="lazy"
         />
 
         {/* Dark overlays for text readability - lighter on mobile since text is below */}

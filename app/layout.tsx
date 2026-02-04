@@ -9,16 +9,21 @@ const bebasNeue = Bebas_Neue({
   weight: "400",
   subsets: ["latin"],
   variable: "--font-display",
+  display: "swap",
 });
 
 const outfit = Outfit({
+  weight: ["300", "400", "500", "600", "700"],
   subsets: ["latin"],
   variable: "--font-sans",
+  display: "swap",
 });
 
 const cinzel = Cinzel({
+  weight: ["400", "600", "700"],
   subsets: ["latin"],
   variable: "--font-cinematic",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
