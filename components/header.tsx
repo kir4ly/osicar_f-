@@ -17,6 +17,7 @@ import { CTAButton } from "@/components/cta-button";
 const navigation = [
   { name: "Főoldal", href: "/#hero" },
   { name: "Kínálat", href: "/#kinalat" },
+  { name: "Eladva", href: "/eladva" },
   { name: "Szolgáltatások", href: "/szolgaltatasok" },
   { name: "Kapcsolat", href: "/rolunk#kapcsolat" },
 ];
