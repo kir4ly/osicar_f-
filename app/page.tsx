@@ -32,8 +32,8 @@ export default async function HomePage() {
 
   return (
     <div className="grain-overlay">
-      {/* Spacer a fixed header + safe area alatt */}
-      <div className="md:h-0" style={{ height: 'calc(4rem + env(safe-area-inset-top, 0px))' }} />
+      {/* Spacer a fixed header + safe area alatt - csak mobilon */}
+      <div className="h-[calc(4rem+env(safe-area-inset-top,0px))] md:h-0" />
 
       {/* Hero Section */}
       {/* Mobile: stacked layout (image then text below). Desktop: overlay layout */}
