@@ -123,15 +123,10 @@
   }
   body {
     @apply bg-background text-foreground font-sans;
-    overflow-y: scroll !important;
-    margin-right: 0 !important;
-    padding-right: 0 !important;
   }
   /* Prevent layout shift when modals/dropdowns open */
   body[data-scroll-locked] {
-    overflow-y: scroll !important;
-    margin-right: 0 !important;
-    padding-right: 0 !important;
+    overflow: hidden !important;
   }
 }
 
@@ -326,21 +321,27 @@ html {
   }
 }
 
-/* Desktop scrollbar stílus */
+/* Desktop scrollbar stílus - overlay */
 @media (min-width: 768px) {
+  html {
+    overflow-y: overlay !important;
+  }
   html::-webkit-scrollbar {
-    width: 8px;
-    background: #000;
+    width: 10px;
+    background: transparent;
   }
   html::-webkit-scrollbar-track {
-    background: #000;
+    background: transparent;
   }
   html::-webkit-scrollbar-thumb {
-    background: #333;
-    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 5px;
+    border: 2px solid transparent;
+    background-clip: content-box;
   }
   html::-webkit-scrollbar-thumb:hover {
-    background: #444;
+    background: rgba(255, 255, 255, 0.3);
+    background-clip: content-box;
   }
 }
 
@@ -368,7 +369,7 @@ html {
 /* Prevent horizontal overflow on mobile */
 html {
   overflow-x: hidden;
-  overflow-y: scroll !important;
+  overflow-y: auto;
   margin: 0;
   padding: 0;
   width: 100%;
@@ -379,7 +380,7 @@ html {
 
 body {
   overflow-x: hidden;
-  overflow-y: scroll !important;
+  overflow-y: visible;
   max-width: 100%;
   width: 100%;
   margin: 0;
