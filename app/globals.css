@@ -330,16 +330,17 @@ html {
 @media (min-width: 768px) {
   html::-webkit-scrollbar {
     width: 8px;
+    background: #000;
   }
   html::-webkit-scrollbar-track {
-    background: #111;
+    background: #000;
   }
   html::-webkit-scrollbar-thumb {
-    background: #444;
+    background: #333;
     border-radius: 4px;
   }
   html::-webkit-scrollbar-thumb:hover {
-    background: #555;
+    background: #444;
   }
 }
 
