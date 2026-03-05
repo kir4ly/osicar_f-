@@ -314,15 +314,33 @@ html {
   background-color: #000;
 }
 
-/* Hide scrollbar but keep functionality */
-html::-webkit-scrollbar {
-  width: 0;
-  background: transparent;
+/* Scrollbar - mobilon rejtett, desktopon látható */
+@media (max-width: 767px) {
+  html::-webkit-scrollbar {
+    width: 0;
+    background: transparent;
+  }
+  html {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
 }
 
-html {
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE/Edge */
+/* Desktop scrollbar stílus */
+@media (min-width: 768px) {
+  html::-webkit-scrollbar {
+    width: 8px;
+  }
+  html::-webkit-scrollbar-track {
+    background: #111;
+  }
+  html::-webkit-scrollbar-thumb {
+    background: #444;
+    border-radius: 4px;
+  }
+  html::-webkit-scrollbar-thumb:hover {
+    background: #555;
+  }
 }
 
 /* Selection color */
