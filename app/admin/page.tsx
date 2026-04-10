@@ -13,8 +13,6 @@ import {
 } from "@/components/ui/select";
 import { Plus, X, Upload, Link as LinkIcon, Check, PackageCheck } from "lucide-react";
 
-const ADMIN_PASSWORD = "sprinter123";
-
 async function triggerRevalidation() {
   try {
     await fetch("/api/revalidate", { method: "POST" });
@@ -70,13 +68,23 @@ export default function AdminPage() {
     }
   }, [isAuthenticated]);
 
-  function handleLogin(e: React.FormEvent) {
+  async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
-    if (password === ADMIN_PASSWORD) {
-      setIsAuthenticated(true);
-      sessionStorage.setItem("adminAuth", "true");
-      setPasswordError(false);
-    } else {
+    try {
+      const response = await fetch("/api/admin/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password }),
+      });
+
+      if (response.ok) {
+        setIsAuthenticated(true);
+        sessionStorage.setItem("adminAuth", "true");
+        setPasswordError(false);
+      } else {
+        setPasswordError(true);
+      }
+    } catch {
       setPasswordError(true);
     }
   }
