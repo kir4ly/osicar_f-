@@ -61,6 +61,7 @@ function CarImageCarousel({
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             className={`object-contain transition-transform duration-700 ${grayscale ? 'grayscale' : ''}`}
             loading={priority ? "eager" : "lazy"}
+            unoptimized
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-foreground/5 to-foreground/10">

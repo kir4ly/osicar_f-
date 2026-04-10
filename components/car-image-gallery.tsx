@@ -128,6 +128,7 @@ export function CarImageGallery({ images, brand, model }: CarImageGalleryProps) 
             priority
             quality={80}
             className="object-contain"
+            unoptimized
           />
         </button>
 
@@ -186,6 +187,7 @@ export function CarImageGallery({ images, brand, model }: CarImageGalleryProps) 
                 sizes="(max-width: 1024px) 25vw, 12.5vw"
                 loading="lazy"
                 className="object-contain"
+                unoptimized
               />
             </button>
           ))}
@@ -223,6 +225,7 @@ export function CarImageGallery({ images, brand, model }: CarImageGalleryProps) 
               sizes="90vw"
               className="object-contain"
               priority
+              unoptimized
             />
           </div>
 
