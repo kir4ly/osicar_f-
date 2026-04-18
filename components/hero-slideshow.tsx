@@ -74,6 +74,7 @@ export function HeroSection() {
           priority
           sizes="100vw"
           quality={80}
+          unoptimized
         />
 
         <Image
@@ -86,6 +87,7 @@ export function HeroSection() {
           sizes="100vw"
           quality={80}
           loading="lazy"
+          unoptimized
         />
 
         {/* Dark overlays for text readability - lighter on mobile since text is below */}
