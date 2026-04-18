@@ -11,7 +11,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Plus, X, Upload, Link as LinkIcon, Check, PackageCheck } from "lucide-react";
+import { Plus, X, Upload, Link as LinkIcon, Check, PackageCheck, Download } from "lucide-react";
+import { jsPDF } from "jspdf";
+import QRCode from "qrcode";
 
 async function triggerRevalidation() {
   try {
@@ -23,6 +25,303 @@ async function triggerRevalidation() {
 
 function formatPrice(price: number): string {
   return new Intl.NumberFormat("hu-HU").format(price);
+}
+
+// Roboto font betöltése és cache-elése
+let robotoFontLoaded = false;
+let robotoFontBase64: string | null = null;
+
+async function loadRobotoFont(): Promise<string> {
+  if (robotoFontBase64) return robotoFontBase64;
+
+  // Roboto Regular font CDN-ről
+  const fontUrl = 'https://fonts.gstatic.com/s/roboto/v30/KFOmCnqEu92Fr1Me5WZLCzYlKw.ttf';
+
+  try {
+    const response = await fetch(fontUrl);
+    const arrayBuffer = await response.arrayBuffer();
+    const uint8Array = new Uint8Array(arrayBuffer);
+    let binary = '';
+    for (let i = 0; i < uint8Array.length; i++) {
+      binary += String.fromCharCode(uint8Array[i]);
+    }
+    robotoFontBase64 = btoa(binary);
+    return robotoFontBase64;
+  } catch (error) {
+    console.error('Failed to load Roboto font:', error);
+    throw error;
+  }
+}
+
+// Logo betöltése és PNG-re konvertálása az eredeti arányokkal
+interface LogoResult {
+  dataUrl: string;
+  aspectRatio: number; // width / height
+}
+
+async function loadLogoWithDimensions(): Promise<LogoResult | null> {
+  try {
+    // SVG logo betöltése (cache-busting)
+    const response = await fetch('/logo-osicar.svg?v=' + Date.now());
+    if (!response.ok) return null;
+
+    const svgText = await response.text();
+
+    return new Promise((resolve) => {
+      const img = new window.Image();
+      const svgBlob = new Blob([svgText], { type: 'image/svg+xml;charset=utf-8' });
+      const url = URL.createObjectURL(svgBlob);
+
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        // A canvas mérete a kép arányaihoz igazodik
+        const scale = 4; // Nagy felbontás a jó minőségért
+        canvas.width = img.width * scale;
+        canvas.height = img.height * scale;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          // Átlátszó háttér
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          const dataUrl = canvas.toDataURL('image/png');
+          const aspectRatio = img.width / img.height;
+          resolve({ dataUrl, aspectRatio });
+        } else {
+          resolve(null);
+        }
+        URL.revokeObjectURL(url);
+      };
+
+      img.onerror = () => {
+        URL.revokeObjectURL(url);
+        resolve(null);
+      };
+
+      img.src = url;
+    });
+  } catch (error) {
+    console.error('Failed to load logo:', error);
+    return null;
+  }
+}
+
+// Saját szövegtördelő függvény
+function wrapText(doc: jsPDF, text: string, maxWidth: number): string[] {
+  const words = text.split(/\s+/);
+  const lines: string[] = [];
+  let currentLine = '';
+
+  for (const word of words) {
+    const testLine = currentLine ? `${currentLine} ${word}` : word;
+    const testWidth = doc.getTextWidth(testLine);
+
+    if (testWidth > maxWidth && currentLine) {
+      lines.push(currentLine);
+      currentLine = word;
+    } else {
+      currentLine = testLine;
+    }
+  }
+
+  if (currentLine) {
+    lines.push(currentLine);
+  }
+
+  return lines;
+}
+
+// Ártábla PDF generálás
+async function generatePriceTable(car: CarData): Promise<void> {
+  const doc = new jsPDF({
+    orientation: "portrait",
+    unit: "mm",
+    format: "a4",
+  });
+
+  // Roboto font betöltése és hozzáadása
+  try {
+    const fontBase64 = await loadRobotoFont();
+    doc.addFileToVFS('Roboto-Regular.ttf', fontBase64);
+    doc.addFont('Roboto-Regular.ttf', 'Roboto', 'normal');
+    robotoFontLoaded = true;
+  } catch {
+    console.warn('Could not load Roboto font, falling back to helvetica');
+  }
+
+  const useRoboto = robotoFontLoaded;
+  const fontFamily = useRoboto ? 'Roboto' : 'helvetica';
+
+  const pageWidth = doc.internal.pageSize.getWidth(); // 210mm
+  const pageHeight = doc.internal.pageSize.getHeight(); // 297mm
+  const margin = 20;
+  const contentWidth = pageWidth - 2 * margin;
+  const spacing = 6; // Egységes térköz
+  let y = margin;
+
+  // QR kód méretek
+  const qrSize = 40;
+  const qrBottomMargin = margin + qrSize + spacing;
+
+  // QR kód generálás
+  const carUrl = `https://osicar.hu/autok/db/${car.id}`;
+  let qrDataUrl: string | null = null;
+  try {
+    qrDataUrl = await QRCode.toDataURL(carUrl, { width: 300, margin: 1 });
+  } catch (err) {
+    console.error("QR code generation failed:", err);
+  }
+
+  // === FEJLÉC ===
+  // Logo középen
+  try {
+    const logoResult = await loadLogoWithDimensions();
+    if (logoResult) {
+      const { dataUrl, aspectRatio } = logoResult;
+      const logoWidth = 65;
+      const logoHeight = logoWidth / aspectRatio;
+      const logoX = (pageWidth - logoWidth) / 2;
+      doc.addImage(dataUrl, "PNG", logoX, y, logoWidth, logoHeight);
+      y += logoHeight + spacing;
+    }
+  } catch (err) {
+    console.error("Logo loading failed:", err);
+    doc.setFontSize(18);
+    doc.setFont(fontFamily, 'normal');
+    doc.text("OSICAR", pageWidth / 2, y + 10, { align: "center" });
+    y += 15;
+  }
+
+  // Elérhetőségek
+  doc.setFontSize(9);
+  doc.setFont(fontFamily, 'normal');
+  doc.text("9500 Celldömölk, Magyarország  |  +36 70 605 0350  |  info@osicar.hu", pageWidth / 2, y, { align: "center" });
+  y += spacing * 2;
+
+  // Elválasztó vonal
+  doc.setDrawColor(200, 200, 200);
+  doc.setLineWidth(0.5);
+  doc.line(margin, y, pageWidth - margin, y);
+  y += spacing * 2;
+
+  // === AUTÓ ADATOK ===
+  // Autó neve
+  doc.setFontSize(22);
+  doc.setFont(fontFamily, 'normal');
+  const carTitle = `${car.brand} ${car.model}`.toUpperCase();
+  doc.text(carTitle, margin, y);
+  y += spacing * 2;
+
+  // Műszaki adatok táblázat
+  const tableData = [
+    ["Gyártási év:", car.year.toString()],
+    ["Kilométeróra:", `${car.mileage.toLocaleString("hu-HU")} km`],
+    ["Teljesítmény:", `${car.power} LE`],
+    ["Üzemanyag:", car.fuel.charAt(0).toUpperCase() + car.fuel.slice(1)],
+    ["Váltó:", car.transmission.charAt(0).toUpperCase() + car.transmission.slice(1)],
+    ["Szín:", car.color],
+  ];
+
+  const colWidth = contentWidth / 2;
+  const rowHeight = 8;
+
+  doc.setDrawColor(0, 0, 0);
+  doc.setLineWidth(0.4);
+  doc.rect(margin, y, contentWidth, tableData.length * rowHeight + 4, "S");
+
+  doc.setFontSize(10);
+  tableData.forEach((row, index) => {
+    const rowY = y + 5 + index * rowHeight;
+    doc.setFont(fontFamily, 'normal');
+    doc.text(row[0], margin + 5, rowY);
+    doc.text(row[1], margin + colWidth, rowY);
+  });
+
+  y += tableData.length * rowHeight + 4 + spacing * 2;
+
+  // Vételár
+  doc.setFontSize(14);
+  doc.setFont(fontFamily, 'normal');
+  doc.text("Vételár:", margin, y);
+  doc.setFontSize(22);
+  doc.text(`${formatPrice(car.price)} Ft`, margin + 26, y);
+  y += spacing * 2;
+
+  // Elválasztó vonal
+  doc.setDrawColor(200, 200, 200);
+  doc.setLineWidth(0.5);
+  doc.line(margin, y, pageWidth - margin, y);
+  y += spacing * 2;
+
+  // === LEÍRÁS ===
+  if (car.description) {
+    doc.setFontSize(13);
+    doc.setFont(fontFamily, 'normal');
+    doc.text("Leírás:", margin, y);
+    y += spacing + 2;
+
+    doc.setFontSize(11);
+    const descLines = wrapText(doc, car.description, contentWidth);
+    const lineHeight = 5.5;
+    let currentPage = 1;
+
+    for (const line of descLines) {
+      const bottomLimit = currentPage === 1 ? pageHeight - qrBottomMargin : pageHeight - margin;
+      if (y > bottomLimit) {
+        doc.addPage();
+        currentPage++;
+        y = margin;
+      }
+      doc.text(line, margin, y);
+      y += lineHeight;
+    }
+    y += spacing;
+  }
+
+  // === FELSZERELTSÉG ===
+  if (car.features && car.features.length > 0) {
+    const currentPage = doc.getNumberOfPages();
+    const bottomLimit = currentPage === 1 ? pageHeight - qrBottomMargin : pageHeight - margin;
+
+    if (y > bottomLimit - 15) {
+      doc.addPage();
+      y = margin;
+    }
+
+    doc.setFontSize(13);
+    doc.setFont(fontFamily, 'normal');
+    doc.text("Felszereltség:", margin, y);
+    y += spacing + 2;
+
+    doc.setFontSize(9);
+    const featuresText = car.features.join("  •  ");
+    const featureLines = wrapText(doc, featuresText, contentWidth);
+    const lineHeight = 4.5;
+
+    for (const line of featureLines) {
+      const currentPageNow = doc.getNumberOfPages();
+      const bottomLimitNow = currentPageNow === 1 ? pageHeight - qrBottomMargin : pageHeight - margin;
+      if (y > bottomLimitNow) {
+        doc.addPage();
+        y = margin;
+      }
+      doc.text(line, margin, y);
+      y += lineHeight;
+    }
+  }
+
+  // === QR KÓD ===
+  doc.setPage(1);
+  if (qrDataUrl) {
+    const qrX = (pageWidth - qrSize) / 2;
+    doc.addImage(qrDataUrl, "PNG", qrX, pageHeight - margin - qrSize, qrSize, qrSize);
+  }
+
+  // PDF mentése
+  const fileName = `artabla_${car.brand}_${car.model}_${car.year}.pdf`
+    .toLowerCase()
+    .replace(/\s+/g, "_")
+    .replace(/[^a-z0-9_.-]/g, "");
+
+  doc.save(fileName);
 }
 
 export default function AdminPage() {
@@ -878,6 +1177,13 @@ export default function AdminPage() {
                       Szerkesztés
                     </button>
                     <button
+                      onClick={() => generatePriceTable(car)}
+                      className="h-9 md:h-10 px-4 md:px-6 border border-orange-500/50 text-orange-500 text-xs md:text-sm uppercase tracking-widest hover:bg-orange-500/10 transition-colors duration-300 flex items-center gap-2"
+                    >
+                      <Download className="w-4 h-4" />
+                      Ártábla
+                    </button>
+                    <button
                       onClick={() => toggleSold(car)}
                       className="h-9 md:h-10 px-4 md:px-6 border border-green-500/50 text-green-500 text-xs md:text-sm uppercase tracking-widest hover:bg-green-500/10 transition-colors duration-300"
                     >
@@ -939,6 +1245,13 @@ export default function AdminPage() {
                       </div>
                       <div className="flex flex-wrap gap-2 md:gap-3 ml-10 md:ml-14">
                         <button
+                          onClick={() => generatePriceTable(car)}
+                          className="h-9 md:h-10 px-4 md:px-6 border border-orange-500/50 text-orange-500 text-xs md:text-sm uppercase tracking-widest hover:bg-orange-500/10 transition-colors duration-300 flex items-center gap-2"
+                        >
+                          <Download className="w-4 h-4" />
+                          Ártábla
+                        </button>
+                        <button
                           onClick={() => toggleSold(car)}
                           className="h-9 md:h-10 px-4 md:px-6 border border-green-500/50 text-green-500 text-xs md:text-sm uppercase tracking-widest hover:bg-green-500/10 transition-colors duration-300"
                         >
@@ -995,6 +1308,13 @@ export default function AdminPage() {
                         </div>
                       </div>
                       <div className="flex flex-wrap gap-2 md:gap-3 ml-10 md:ml-14">
+                        <button
+                          onClick={() => generatePriceTable(car)}
+                          className="h-9 md:h-10 px-4 md:px-6 border border-orange-500/50 text-orange-500 text-xs md:text-sm uppercase tracking-widest hover:bg-orange-500/10 transition-colors duration-300 flex items-center gap-2"
+                        >
+                          <Download className="w-4 h-4" />
+                          Ártábla
+                        </button>
                         <button
                           onClick={() => toggleFulfilled(car)}
                           className="h-9 md:h-10 px-4 md:px-6 border border-blue-500/50 text-blue-500 text-xs md:text-sm uppercase tracking-widest hover:bg-blue-500/10 transition-colors duration-300"
