@@ -312,7 +312,13 @@ async function generatePriceTable(car: CarData): Promise<void> {
   doc.setPage(1);
   if (qrDataUrl) {
     const qrX = (pageWidth - qrSize) / 2;
-    doc.addImage(qrDataUrl, "PNG", qrX, pageHeight - margin - qrSize, qrSize, qrSize);
+    const qrY = pageHeight - margin - qrSize - 6; // Feljebb, hogy a szöveg elférjen
+    doc.addImage(qrDataUrl, "PNG", qrX, qrY, qrSize, qrSize);
+
+    // osicar.hu felirat a QR kód alatt
+    doc.setFontSize(9);
+    doc.setFont(fontFamily, 'normal');
+    doc.text("osicar.hu", pageWidth / 2, qrY + qrSize + 5, { align: "center" });
   }
 
   // PDF mentése
