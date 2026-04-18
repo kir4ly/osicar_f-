@@ -11,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Plus, X, Upload, Link as LinkIcon, Check, PackageCheck, Download } from "lucide-react";
+import { Plus, X, Upload, Link as LinkIcon, Check, PackageCheck, Download, Search } from "lucide-react";
 import { jsPDF } from "jspdf";
 import QRCode from "qrcode";
 
@@ -334,6 +334,7 @@ export default function AdminPage() {
   const [saving, setSaving] = useState(false);
   const [editingCar, setEditingCar] = useState<CarData | null>(null);
   const [showForm, setShowForm] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const [formData, setFormData] = useState({
     brand: "",
@@ -784,7 +785,7 @@ export default function AdminPage() {
           </h1>
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-3 md:gap-4 mb-8 md:mb-12 animate-fade-up delay-200">
+        <div className="flex flex-col sm:flex-row gap-3 md:gap-4 mb-6 md:mb-8 animate-fade-up delay-200">
           <button
             onClick={() => {
               resetForm();
@@ -803,6 +804,20 @@ export default function AdminPage() {
           >
             Kijelentkezés
           </button>
+        </div>
+
+        {/* Keresés */}
+        <div className="mb-8 md:mb-12 animate-fade-up delay-200">
+          <div className="relative max-w-md">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+            <Input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Keresés márka vagy modell alapján..."
+              className="h-12 md:h-14 bg-transparent border-foreground/10 text-base md:text-lg pl-12"
+            />
+          </div>
         </div>
 
         {showForm && (
@@ -1146,11 +1161,18 @@ export default function AdminPage() {
           <div className="space-y-3 md:space-y-4 animate-fade-up delay-300">
             <div className="mb-4 md:mb-8">
               <p className="text-xs md:text-sm text-muted-foreground">
-                {cars.filter(c => !c.sold && !c.fulfilled).length} elérhető autó
+                {cars.filter(c => !c.sold && !c.fulfilled && (
+                  searchQuery === "" ||
+                  `${c.brand} ${c.model}`.toLowerCase().includes(searchQuery.toLowerCase())
+                )).length} elérhető autó
+                {searchQuery && ` (szűrve: "${searchQuery}")`}
               </p>
             </div>
             <div className="grid gap-3 md:gap-4">
-              {cars.filter(c => !c.sold && !c.fulfilled).map((car) => (
+              {cars.filter(c => !c.sold && !c.fulfilled && (
+                searchQuery === "" ||
+                `${c.brand} ${c.model}`.toLowerCase().includes(searchQuery.toLowerCase())
+              )).map((car) => (
                 <div
                   key={car.id}
                   className="border border-foreground/10 p-4 md:p-6 flex flex-col gap-3 md:gap-4"
@@ -1207,7 +1229,10 @@ export default function AdminPage() {
             </div>
 
             {/* Eladott autók szekció */}
-            {cars.filter(c => c.sold).length > 0 && (
+            {cars.filter(c => c.sold && (
+              searchQuery === "" ||
+              `${c.brand} ${c.model}`.toLowerCase().includes(searchQuery.toLowerCase())
+            )).length > 0 && (
               <>
                 <div className="border-t border-foreground/10 pt-8 mt-8">
                   <div className="flex items-center gap-2 mb-4 md:mb-6">
@@ -1216,12 +1241,18 @@ export default function AdminPage() {
                       Eladott autók
                     </h3>
                     <span className="text-xs md:text-sm text-muted-foreground">
-                      ({cars.filter(c => c.sold).length} db)
+                      ({cars.filter(c => c.sold && (
+                        searchQuery === "" ||
+                        `${c.brand} ${c.model}`.toLowerCase().includes(searchQuery.toLowerCase())
+                      )).length} db)
                     </span>
                   </div>
                 </div>
                 <div className="grid gap-3 md:gap-4">
-                  {cars.filter(c => c.sold).map((car) => (
+                  {cars.filter(c => c.sold && (
+                    searchQuery === "" ||
+                    `${c.brand} ${c.model}`.toLowerCase().includes(searchQuery.toLowerCase())
+                  )).map((car) => (
                     <div
                       key={car.id}
                       className="border border-green-500/30 bg-green-500/5 p-4 md:p-6 flex flex-col gap-3 md:gap-4 opacity-70"
@@ -1271,7 +1302,10 @@ export default function AdminPage() {
             )}
 
             {/* Teljesített megrendelések szekció */}
-            {cars.filter(c => c.fulfilled).length > 0 && (
+            {cars.filter(c => c.fulfilled && (
+              searchQuery === "" ||
+              `${c.brand} ${c.model}`.toLowerCase().includes(searchQuery.toLowerCase())
+            )).length > 0 && (
               <>
                 <div className="border-t border-foreground/10 pt-8 mt-8">
                   <div className="flex items-center gap-2 mb-4 md:mb-6">
@@ -1280,12 +1314,18 @@ export default function AdminPage() {
                       Teljesített megrendelések
                     </h3>
                     <span className="text-xs md:text-sm text-muted-foreground">
-                      ({cars.filter(c => c.fulfilled).length} db)
+                      ({cars.filter(c => c.fulfilled && (
+                        searchQuery === "" ||
+                        `${c.brand} ${c.model}`.toLowerCase().includes(searchQuery.toLowerCase())
+                      )).length} db)
                     </span>
                   </div>
                 </div>
                 <div className="grid gap-3 md:gap-4">
-                  {cars.filter(c => c.fulfilled).map((car) => (
+                  {cars.filter(c => c.fulfilled && (
+                    searchQuery === "" ||
+                    `${c.brand} ${c.model}`.toLowerCase().includes(searchQuery.toLowerCase())
+                  )).map((car) => (
                     <div
                       key={car.id}
                       className="border border-blue-500/30 bg-blue-500/5 p-4 md:p-6 flex flex-col gap-3 md:gap-4 opacity-60"
