@@ -193,7 +193,7 @@ async function generatePriceTable(car: CarData): Promise<void> {
   // Elérhetőségek
   doc.setFontSize(9);
   doc.setFont(fontFamily, 'normal');
-  doc.text("9500 Celldömölk, Magyarország  |  +36 70 605 0350  |  info@osicar.hu", pageWidth / 2, y, { align: "center" });
+  doc.text("9600 Sárvár, Magyarország  |  +36 70 605 0350  |  info@osicar.hu", pageWidth / 2, y, { align: "center" });
   y += spacing * 2;
 
   // Elválasztó vonal
