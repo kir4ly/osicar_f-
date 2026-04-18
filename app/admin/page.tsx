@@ -327,6 +327,31 @@ async function generatePriceTable(car: CarData): Promise<void> {
     .replace(/\s+/g, "_")
     .replace(/[^a-z0-9_.-]/g, "");
 
+  // Mobilon a Web Share API-t használjuk, hogy le lehessen tölteni/megosztani
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+  if (isMobile && navigator.share && navigator.canShare) {
+    // PDF blob létrehozása
+    const pdfBlob = doc.output('blob');
+    const file = new File([pdfBlob], fileName, { type: 'application/pdf' });
+
+    // Ellenőrizzük, hogy megosztható-e
+    if (navigator.canShare({ files: [file] })) {
+      try {
+        await navigator.share({
+          files: [file],
+          title: `${car.brand} ${car.model} ártábla`,
+        });
+        return;
+      } catch (err) {
+        // Ha a felhasználó bezárja a share dialogot, ne csináljunk semmit
+        if ((err as Error).name === 'AbortError') return;
+        console.log('Share failed, falling back to download');
+      }
+    }
+  }
+
+  // Desktop vagy ha a share nem működik
   doc.save(fileName);
 }
 
