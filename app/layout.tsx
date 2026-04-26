@@ -4,6 +4,7 @@ import "./globals.css";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { IOSOverscrollFix } from "@/components/ios-overscroll-fix";
+import { CookieBanner } from "@/components/cookie-banner";
 
 const bebasNeue = Bebas_Neue({
   weight: "400",
@@ -61,6 +62,7 @@ export default function RootLayout({
         <Header />
         <main className="flex-1">{children}</main>
         <Footer />
+        <CookieBanner />
       </body>
     </html>
   );
