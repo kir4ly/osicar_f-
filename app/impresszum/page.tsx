@@ -30,6 +30,7 @@ export default function ImpresszumPage() {
           items={[
             { label: "Név", value: "Osváth Alajos Gábor egyéni vállalkozó" },
             { label: "Székhely", value: "9500 Celldömölk, Kinizsi utca 8." },
+            { label: "Nyilvántartási szám", value: "52278305" },
             { label: "Adószám", value: "68806545-2-38" },
             {
               label: "E-mail",
