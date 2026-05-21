@@ -437,6 +437,17 @@ export default function AdminPage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+
+    if (uploadingImage) {
+      alert("Várd meg, amíg a képek feltöltése befejeződik!");
+      return;
+    }
+
+    if (imageUrls.length === 0) {
+      alert("Legalább egy képet fel kell tölteni a mentés előtt!");
+      return;
+    }
+
     setSaving(true);
 
     const carData = {
@@ -689,30 +700,27 @@ export default function AdminPage() {
     setUploadingImage(true);
     const totalFiles = files.length;
     let uploadedCount = 0;
+    let skippedCount = 0;
 
     for (const file of Array.from(files)) {
       try {
         setUploadProgress(`${uploadedCount + 1}/${totalFiles} feldolgozás...`);
 
         let uploadBlob: Blob;
-        let contentType: string;
-        let ext: string;
+        const contentType = 'image/jpeg';
+        const ext = 'jpg';
 
         try {
           uploadBlob = await optimizeImage(file);
-          contentType = 'image/jpeg';
-          ext = 'jpg';
         } catch (optimizeError) {
-          console.log('Optimization failed, uploading original:', optimizeError);
-          // Ha az optimalizálás nem sikerül (pl. HEIC nem támogatott), feltöltjük az eredetit
-          uploadBlob = file;
-          contentType = file.type || 'image/jpeg';
-          ext = file.name.split('.').pop()?.toLowerCase() || 'jpg';
-          // HEIC fájlok esetén próbáljuk JPEG-ként
-          if (ext === 'heic' || ext === 'heif') {
-            ext = 'jpg';
-            contentType = 'image/jpeg';
-          }
+          console.error('Optimization failed:', file.name, optimizeError);
+          alert(
+            `Nem sikerült feldolgozni: ${file.name}\n\n` +
+            `Valószínűleg HEIC formátumú iPhone fotó vagy sérült kép. ` +
+            `Mentsd el JPEG/PNG formátumban és próbáld újra.`
+          );
+          skippedCount++;
+          continue;
         }
 
         setUploadProgress(`${uploadedCount + 1}/${totalFiles} feltöltés...`);
@@ -743,6 +751,7 @@ export default function AdminPage() {
       } catch (err) {
         console.error('Image upload error:', err);
         alert(`Hiba a kép feltöltése során: ${file.name}`);
+        skippedCount++;
       }
     }
 
@@ -750,10 +759,18 @@ export default function AdminPage() {
     setUploadProgress("");
     e.target.value = '';
 
-    if (uploadedCount > 0) {
-      // Kis visszajelzés sikeres feltöltésről
-      setUploadProgress(`${uploadedCount} kép feltöltve!`);
-      setTimeout(() => setUploadProgress(""), 2000);
+    if (skippedCount > 0 && uploadedCount === 0) {
+      alert(
+        `FIGYELEM: Egyetlen kép sem töltődött fel! (${skippedCount} kihagyva)\n\n` +
+        `Próbáld újra, vagy ellenőrizd a fájlokat. ` +
+        `Az autót addig NEM lehet menteni, amíg legalább egy kép fel nem töltődött.`
+      );
+    } else if (uploadedCount > 0) {
+      const msg = skippedCount > 0
+        ? `${uploadedCount} kép feltöltve, ${skippedCount} kihagyva!`
+        : `${uploadedCount} kép feltöltve!`;
+      setUploadProgress(msg);
+      setTimeout(() => setUploadProgress(""), 3000);
     }
   }
 
@@ -1158,10 +1175,25 @@ export default function AdminPage() {
               <div className="flex flex-col sm:flex-row gap-3 md:gap-4 pt-4">
                 <button
                   type="submit"
-                  disabled={saving}
-                  className="inline-flex items-center justify-center h-12 md:h-14 px-6 md:px-10 bg-primary text-primary-foreground text-xs md:text-sm uppercase tracking-widest hover:bg-primary/90 transition-colors duration-300 disabled:opacity-50"
+                  disabled={saving || uploadingImage || imageUrls.length === 0}
+                  className="inline-flex items-center justify-center h-12 md:h-14 px-6 md:px-10 bg-primary text-primary-foreground text-xs md:text-sm uppercase tracking-widest hover:bg-primary/90 transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                  title={
+                    uploadingImage
+                      ? "Várj, amíg a képek feltöltése befejeződik"
+                      : imageUrls.length === 0
+                      ? "Legalább egy kép kötelező"
+                      : undefined
+                  }
                 >
-                  {saving ? "Mentés..." : editingCar ? "Mentés" : "Hozzáadás"}
+                  {saving
+                    ? "Mentés..."
+                    : uploadingImage
+                    ? "Képek feltöltése..."
+                    : imageUrls.length === 0
+                    ? "Tölts fel képet"
+                    : editingCar
+                    ? "Mentés"
+                    : "Hozzáadás"}
                 </button>
                 <button
                   type="button"
