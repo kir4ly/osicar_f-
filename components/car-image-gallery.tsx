@@ -126,9 +126,8 @@ export function CarImageGallery({ images, brand, model }: CarImageGalleryProps) 
             fill
             sizes="(max-width: 1024px) 100vw, 50vw"
             priority
-            quality={80}
+            quality={75}
             className="object-contain"
-            unoptimized
           />
         </button>
 
@@ -186,8 +185,8 @@ export function CarImageGallery({ images, brand, model }: CarImageGalleryProps) 
                 fill
                 sizes="(max-width: 1024px) 25vw, 12.5vw"
                 loading="lazy"
+                quality={60}
                 className="object-contain"
-                unoptimized
               />
             </button>
           ))}
@@ -223,9 +222,9 @@ export function CarImageGallery({ images, brand, model }: CarImageGalleryProps) 
               alt={`${brand} ${model} - ${lightboxIndex + 1}`}
               fill
               sizes="90vw"
+              quality={85}
               className="object-contain"
               priority
-              unoptimized
             />
           </div>
 

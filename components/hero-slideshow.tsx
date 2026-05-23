@@ -73,8 +73,7 @@ export function HeroSection() {
           className="object-cover object-center"
           priority
           sizes="100vw"
-          quality={80}
-          unoptimized
+          quality={75}
         />
 
         <Image
@@ -85,9 +84,8 @@ export function HeroSection() {
             isTransitioning ? "opacity-100" : "opacity-0"
           }`}
           sizes="100vw"
-          quality={80}
+          quality={75}
           loading="lazy"
-          unoptimized
         />
 
         {/* Dark overlays for text readability - lighter on mobile since text is below */}

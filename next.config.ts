@@ -1,5 +1,11 @@
 import type { NextConfig } from "next";
 
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+if (!supabaseUrl) {
+  throw new Error("Missing NEXT_PUBLIC_SUPABASE_URL env var");
+}
+const supabaseHostname = new URL(supabaseUrl).hostname;
+
 const nextConfig: NextConfig = {
   // Allow dev access from local network (mobile testing)
   allowedDevOrigins: ["192.168.1.154"],
@@ -13,7 +19,7 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "avtfailpzsnelebpvebz.supabase.co",
+        hostname: supabaseHostname,
         pathname: "/storage/v1/object/public/**",
       },
       {

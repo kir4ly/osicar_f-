@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { createClient } from "@supabase/supabase-js";
-import { CarData } from "@/lib/supabase";
+import { CarData, createSupabaseAnonClient } from "@/lib/supabase";
 import { Metadata } from "next";
 import { CTAButton } from "@/components/cta-button";
 import { CarImageGallery } from "@/components/car-image-gallery";
@@ -10,11 +9,8 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 // Revalidate every hour
 export const revalidate = 3600;
 
-const supabaseUrl = "https://avtfailpzsnelebpvebz.supabase.co";
-const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF2dGZhaWxwenNuZWxlYnB2ZWJ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk0MzEyMzcsImV4cCI6MjA4NTAwNzIzN30.I4_YUG2OuJJLspKh9v5Fp0rfAiRtzuZfLbWQbOd5rg0";
-
 async function getCar(id: string): Promise<CarData | null> {
-  const supabase = createClient(supabaseUrl, supabaseAnonKey);
+  const supabase = createSupabaseAnonClient();
   const { data, error } = await supabase
     .from("cars")
     .select("*")
@@ -29,7 +25,7 @@ async function getCar(id: string): Promise<CarData | null> {
 }
 
 async function getAllCars(): Promise<CarData[]> {
-  const supabase = createClient(supabaseUrl, supabaseAnonKey);
+  const supabase = createSupabaseAnonClient();
   const { data, error } = await supabase
     .from("cars")
     .select("id, brand, model")

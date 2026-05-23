@@ -1,6 +1,5 @@
 import { Suspense } from "react";
-import { createClient } from "@supabase/supabase-js";
-import { CarData } from "@/lib/supabase";
+import { CarData, createSupabaseAnonClient } from "@/lib/supabase";
 import { CarFilters } from "./autok/car-filters";
 import { CTAButton } from "@/components/cta-button";
 import { HeroSection } from "@/components/hero-slideshow";
@@ -8,12 +7,8 @@ import { HeroSection } from "@/components/hero-slideshow";
 // Revalidate every 60 seconds as fallback
 export const revalidate = 60;
 
-// Server-side Supabase client
-const supabaseUrl = "https://avtfailpzsnelebpvebz.supabase.co";
-const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF2dGZhaWxwenNuZWxlYnB2ZWJ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk0MzEyMzcsImV4cCI6MjA4NTAwNzIzN30.I4_YUG2OuJJLspKh9v5Fp0rfAiRtzuZfLbWQbOd5rg0";
-
 async function getSupabaseCars(): Promise<CarData[]> {
-  const supabase = createClient(supabaseUrl, supabaseAnonKey);
+  const supabase = createSupabaseAnonClient();
   const { data, error } = await supabase
     .from("cars")
     .select("*")

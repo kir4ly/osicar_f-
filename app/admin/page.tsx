@@ -23,6 +23,94 @@ async function triggerRevalidation() {
   }
 }
 
+// Encode a canvas to a compressed Blob, preferring WebP (typically 25-35%
+// smaller than JPEG at the same visual quality) and falling back to JPEG when
+// the browser cannot encode WebP. Keeps storage and bandwidth usage low.
+function encodeCanvas(canvas: HTMLCanvasElement, quality: number): Promise<Blob> {
+  return new Promise((resolve, reject) => {
+    canvas.toBlob(
+      (blob) => {
+        if (blob && blob.type === "image/webp") {
+          resolve(blob);
+          return;
+        }
+        // Browser ignored the WebP request (returned PNG/null) -> use JPEG.
+        canvas.toBlob(
+          (jpeg) =>
+            jpeg ? resolve(jpeg) : reject(new Error("Failed to create blob")),
+          "image/jpeg",
+          quality
+        );
+      },
+      "image/webp",
+      quality
+    );
+  });
+}
+
+// Resize within maxWidth and re-encode. Uses createImageBitmap, which decodes
+// efficiently and honours EXIF orientation. On iOS Safari this also decodes
+// HEIC natively (fast, low memory) - the common path since the dealer uploads
+// mostly from iPhone.
+async function bitmapToBlob(blob: Blob, maxWidth: number, quality: number): Promise<Blob> {
+  const bitmap = await createImageBitmap(blob);
+  try {
+    const canvas = document.createElement("canvas");
+    let { width, height } = bitmap;
+    const maxDimension = Math.max(width, height);
+    if (maxDimension > maxWidth) {
+      const scale = maxWidth / maxDimension;
+      width = Math.round(width * scale);
+      height = Math.round(height * scale);
+    }
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) throw new Error("Canvas context not available");
+    ctx.fillStyle = "#000000";
+    ctx.fillRect(0, 0, width, height);
+    ctx.drawImage(bitmap, 0, 0, width, height);
+    return await encodeCanvas(canvas, quality);
+  } finally {
+    bitmap.close();
+  }
+}
+
+// Fallback decode path using an <img> element, for browsers without a working
+// createImageBitmap.
+function imageElementToBlob(blob: Blob, maxWidth: number, quality: number): Promise<Blob> {
+  return new Promise((resolve, reject) => {
+    const img = new window.Image();
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      let { width, height } = img;
+      const maxDimension = Math.max(width, height);
+      if (maxDimension > maxWidth) {
+        const scale = maxWidth / maxDimension;
+        width = Math.round(width * scale);
+        height = Math.round(height * scale);
+      }
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) {
+        reject(new Error("Canvas context not available"));
+        return;
+      }
+      ctx.fillStyle = "#000000";
+      ctx.fillRect(0, 0, width, height);
+      ctx.drawImage(img, 0, 0, width, height);
+      URL.revokeObjectURL(img.src);
+      encodeCanvas(canvas, quality).then(resolve).catch(reject);
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(img.src);
+      reject(new Error("Failed to load image"));
+    };
+    img.src = URL.createObjectURL(blob);
+  });
+}
+
 function formatPrice(price: number): string {
   return new Intl.NumberFormat("hu-HU").format(price);
 }
@@ -465,23 +553,22 @@ export default function AdminPage() {
       images: imageUrls,
     };
 
-    let error;
-    if (editingCar) {
-      const { error: updateError } = await supabase
-        .from("cars")
-        .update(carData)
-        .eq("id", editingCar.id);
-      error = updateError;
-    } else {
-      const { error: insertError } = await supabase
-        .from("cars")
-        .insert([carData]);
-      error = insertError;
-    }
+    const response = editingCar
+      ? await fetch(`/api/admin/cars/${editingCar.id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(carData),
+        })
+      : await fetch("/api/admin/cars", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(carData),
+        });
 
-    if (error) {
-      console.error("Error saving car:", error);
-      alert("Hiba történt a mentés során: " + error.message);
+    if (!response.ok) {
+      const body = await response.json().catch(() => ({ error: "Ismeretlen hiba" }));
+      console.error("Error saving car:", body);
+      alert("Hiba történt a mentés során: " + (body.error || response.statusText));
     } else {
       resetForm();
       fetchCars();
@@ -493,10 +580,10 @@ export default function AdminPage() {
   async function handleDelete(id: string) {
     if (!confirm("Biztosan törli ezt az autót?")) return;
 
-    const { error } = await supabase.from("cars").delete().eq("id", id);
+    const response = await fetch(`/api/admin/cars/${id}`, { method: "DELETE" });
 
-    if (error) {
-      console.error("Error deleting car:", error);
+    if (!response.ok) {
+      console.error("Error deleting car");
       alert("Hiba történt a törlés során");
     } else {
       fetchCars();
@@ -514,13 +601,14 @@ export default function AdminPage() {
       )
     );
 
-    const { error } = await supabase
-      .from("cars")
-      .update({ sold: !isCurrentlySold })
-      .eq("id", car.id);
+    const response = await fetch(`/api/admin/cars/${car.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ sold: !isCurrentlySold }),
+    });
 
-    if (error) {
-      console.error("Error toggling sold:", error);
+    if (!response.ok) {
+      console.error("Error toggling sold");
       alert("Hiba történt az eladott státusz módosítása során");
       setCars(prevCars =>
         prevCars.map(c =>
@@ -542,13 +630,14 @@ export default function AdminPage() {
       )
     );
 
-    const { error } = await supabase
-      .from("cars")
-      .update({ fulfilled: !isCurrentlyFulfilled })
-      .eq("id", car.id);
+    const response = await fetch(`/api/admin/cars/${car.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ fulfilled: !isCurrentlyFulfilled }),
+    });
 
-    if (error) {
-      console.error("Error toggling fulfilled:", error);
+    if (!response.ok) {
+      console.error("Error toggling fulfilled");
       alert("Hiba történt a teljesítés státusz módosítása során");
       setCars(prevCars =>
         prevCars.map(c =>
@@ -610,87 +699,47 @@ export default function AdminPage() {
     setImageUrls(imageUrls.filter((_, i) => i !== index));
   }
 
-  // Kép optimalizálás - átméretezés és tömörítés (mobil-barát)
+  // Kép optimalizálás - átméretezés és tömörítés (mobil-barát).
+  // Sorrend: 1) natív createImageBitmap (iPhone Safari ezt HEIC-re is tudja,
+  // gyorsan); 2) HEIC esetén lazy heic2any konverzió, majd újra natív dekód
+  // (desktop Chrome/Firefox); 3) <img> elem tartalék. Így a feltöltés minden
+  // böngészőben sikerül - korábban itt tűntek el a HEIC képek.
   async function optimizeImage(file: File, maxWidth = 1600, quality = 0.75): Promise<Blob> {
-    // createImageBitmap jól kezeli az EXIF orientációt és a legtöbb formátumot (HEIC is iOS-en)
-    if (typeof createImageBitmap !== 'undefined') {
+    const hasBitmap = typeof createImageBitmap !== "undefined";
+
+    // 1. Natív dekódolás az eredeti fájlon.
+    if (hasBitmap) {
       try {
-        const bitmap = await createImageBitmap(file);
-        const canvas = document.createElement('canvas');
-        let { width, height } = bitmap;
-
-        // Max méret korlátozás (mobil memória miatt)
-        const maxDimension = Math.max(width, height);
-        if (maxDimension > maxWidth) {
-          const scale = maxWidth / maxDimension;
-          width = Math.round(width * scale);
-          height = Math.round(height * scale);
-        }
-
-        canvas.width = width;
-        canvas.height = height;
-
-        const ctx = canvas.getContext('2d');
-        if (!ctx) throw new Error('Canvas context not available');
-
-        // Fehér háttér (átlátszóság helyett)
-        ctx.fillStyle = '#000000';
-        ctx.fillRect(0, 0, width, height);
-        ctx.drawImage(bitmap, 0, 0, width, height);
-        bitmap.close();
-
-        return await new Promise<Blob>((resolve, reject) => {
-          canvas.toBlob(
-            (blob) => blob ? resolve(blob) : reject(new Error('Failed to create blob')),
-            'image/jpeg',
-            quality
-          );
-        });
+        return await bitmapToBlob(file, maxWidth, quality);
       } catch (e) {
-        console.log('createImageBitmap failed, using fallback:', e);
-        // Fallback to Image element method
+        console.log("Natív dekódolás sikertelen, tartalék próbálkozás:", e);
       }
     }
 
-    return new Promise((resolve, reject) => {
-      const img = new window.Image();
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        let { width, height } = img;
-
-        const maxDimension = Math.max(width, height);
-        if (maxDimension > maxWidth) {
-          const scale = maxWidth / maxDimension;
-          width = Math.round(width * scale);
-          height = Math.round(height * scale);
+    // 2. HEIC/HEIF, amit a böngésző natívan nem tudott dekódolni: konvertálás
+    //    lazy-betöltött dekóderrel, majd újrapróbálás.
+    const lowerName = file.name.toLowerCase();
+    const isHeic =
+      file.type === "image/heic" ||
+      file.type === "image/heif" ||
+      lowerName.endsWith(".heic") ||
+      lowerName.endsWith(".heif");
+    if (isHeic) {
+      const heic2any = (await import("heic2any")).default;
+      const converted = await heic2any({ blob: file, toType: "image/jpeg", quality: 0.92 });
+      const jpegBlob = Array.isArray(converted) ? converted[0] : converted;
+      if (hasBitmap) {
+        try {
+          return await bitmapToBlob(jpegBlob, maxWidth, quality);
+        } catch (e) {
+          console.log("Konvertált kép natív dekódolása sikertelen, <img> tartalék:", e);
         }
+      }
+      return await imageElementToBlob(jpegBlob, maxWidth, quality);
+    }
 
-        canvas.width = width;
-        canvas.height = height;
-
-        const ctx = canvas.getContext('2d');
-        if (!ctx) {
-          reject(new Error('Canvas context not available'));
-          return;
-        }
-
-        ctx.fillStyle = '#000000';
-        ctx.fillRect(0, 0, width, height);
-        ctx.drawImage(img, 0, 0, width, height);
-        URL.revokeObjectURL(img.src);
-
-        canvas.toBlob(
-          (blob) => blob ? resolve(blob) : reject(new Error('Failed to create blob')),
-          'image/jpeg',
-          quality
-        );
-      };
-      img.onerror = () => {
-        URL.revokeObjectURL(img.src);
-        reject(new Error('Failed to load image'));
-      };
-      img.src = URL.createObjectURL(file);
-    });
+    // 3. Tartalék: <img> elemes dekódolás az eredetin.
+    return await imageElementToBlob(file, maxWidth, quality);
   }
 
   async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
@@ -707,8 +756,6 @@ export default function AdminPage() {
         setUploadProgress(`${uploadedCount + 1}/${totalFiles} feldolgozás...`);
 
         let uploadBlob: Blob;
-        const contentType = 'image/jpeg';
-        const ext = 'jpg';
 
         try {
           uploadBlob = await optimizeImage(file);
@@ -725,27 +772,25 @@ export default function AdminPage() {
 
         setUploadProgress(`${uploadedCount + 1}/${totalFiles} feltöltés...`);
 
-        const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${ext}`;
-        const filePath = `car-images/${fileName}`;
+        const formData = new FormData();
+        formData.append("file", uploadBlob, file.name);
 
-        const { error: uploadError } = await supabase.storage
-          .from('Kepfeltoltes')
-          .upload(filePath, uploadBlob, {
-            contentType,
-          });
+        const uploadResponse = await fetch("/api/admin/upload", {
+          method: "POST",
+          body: formData,
+        });
 
-        if (uploadError) {
-          console.error('Upload error:', uploadError);
-          alert(`Hiba a kép feltöltése során: ${uploadError.message}`);
+        if (!uploadResponse.ok) {
+          const body = await uploadResponse.json().catch(() => ({ error: "Ismeretlen hiba" }));
+          console.error("Upload error:", body);
+          alert(`Hiba a kép feltöltése során: ${body.error || uploadResponse.statusText}`);
           continue;
         }
 
-        const { data: publicUrlData } = supabase.storage
-          .from('Kepfeltoltes')
-          .getPublicUrl(filePath);
+        const { url } = await uploadResponse.json();
 
-        if (publicUrlData?.publicUrl) {
-          setImageUrls(prev => [...prev, publicUrlData.publicUrl]);
+        if (url) {
+          setImageUrls(prev => [...prev, url]);
           uploadedCount++;
         }
       } catch (err) {

@@ -37,6 +37,12 @@ yarn-error.log*
 # vercel
 .vercel
 
+# local backups (not for commit)
+.backup/
+
+# local deploy artifacts (not for commit)
+.deploy/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
