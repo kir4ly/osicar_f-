@@ -756,24 +756,25 @@ export default function AdminPage() {
         setUploadProgress(`${uploadedCount + 1}/${totalFiles} feldolgozás...`);
 
         let uploadBlob: Blob;
+        // When the browser cannot decode the image (typically a large HEIC on a
+        // desktop browser), fall back to uploading the original and letting the
+        // server decode + resize it. The stored result is the same optimized
+        // WebP either way.
+        let serverOptimize = false;
 
         try {
           uploadBlob = await optimizeImage(file);
         } catch (optimizeError) {
-          console.error('Optimization failed:', file.name, optimizeError);
-          alert(
-            `Nem sikerült feldolgozni: ${file.name}\n\n` +
-            `Valószínűleg HEIC formátumú iPhone fotó vagy sérült kép. ` +
-            `Mentsd el JPEG/PNG formátumban és próbáld újra.`
-          );
-          skippedCount++;
-          continue;
+          console.log('Kliensoldali optimalizálás sikertelen, szerveres tartalék:', file.name, optimizeError);
+          uploadBlob = file;
+          serverOptimize = true;
         }
 
         setUploadProgress(`${uploadedCount + 1}/${totalFiles} feltöltés...`);
 
         const formData = new FormData();
         formData.append("file", uploadBlob, file.name);
+        if (serverOptimize) formData.append("mode", "server-optimize");
 
         const uploadResponse = await fetch("/api/admin/upload", {
           method: "POST",
